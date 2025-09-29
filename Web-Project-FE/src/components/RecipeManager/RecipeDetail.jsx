@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 function RecipeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState(null);
+  const [ingredients, setIngredients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -38,6 +39,23 @@ function RecipeDetail() {
       fetchRecipeDetail();
     }
   }, [id]);
+
+  // 获取所有ingredients用于名称匹配
+  useEffect(() => {
+    const fetchIngredients = async () => {
+      try {
+        const response = await fetch('http://localhost:5001/api/ingredients');
+        if (response.ok) {
+          const ingredientsData = await response.json();
+          setIngredients(ingredientsData);
+        }
+      } catch (error) {
+        console.error('Error fetching ingredients:', error);
+      }
+    };
+
+    fetchIngredients();
+  }, []);
 
   // 添加获取用户收藏状态的 useEffect
   useEffect(() => {
@@ -331,38 +349,39 @@ function RecipeDetail() {
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Ingredients</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {recipe.ingredients?.map((ingredient, index) => {
-            // 创建ingredient名称到URL参数的映射
+            // 通过名称匹配找到对应的ingredient ID
             const getIngredientId = (name) => {
-              const nameMap = {
-                'fish sauce': 'fish-sauce',
-                'beef bones': 'beef-bones',
-                'flank steak': 'flank-steak',
-                'ginger': 'ginger',
-                'onion': 'onion',
-                'star anise': 'star-anise',
-                'cinnamon stick': 'cinnamon-stick',
-                'coriander': 'coriander',
-                'cloves': 'cloves'
-              };
-              
-              const lowerName = name.toLowerCase();
-              for (const [key, value] of Object.entries(nameMap)) {
-                if (lowerName.includes(key)) {
-                  return value;
+              const foundIngredient = ingredients.find(ing => {
+                const lowerIngName = ing.name.toLowerCase();
+                const lowerSearchName = name.toLowerCase();
+
+                // 尝试完全匹配
+                if (lowerIngName.includes(lowerSearchName) || lowerSearchName.includes(lowerIngName)) {
+                  return true;
                 }
-              }
-              return null;
+
+                // 尝试关键词匹配
+                const keywords = ['fish sauce', 'beef bones', 'flank steak', 'ginger', 'onion', 'star anise', 'cinnamon', 'coriander', 'cloves'];
+                for (const keyword of keywords) {
+                  if (lowerSearchName.includes(keyword) && lowerIngName.includes(keyword)) {
+                    return true;
+                  }
+                }
+
+                return false;
+              });
+
+              return foundIngredient ? foundIngredient.id : null;
             };
 
             const ingredientId = getIngredientId(ingredient.name);
             const isClickable = ingredientId !== null;
-            
+
             return (
-              <div 
-                key={index} 
-                className={`flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200 ${
-                  isClickable ? 'cursor-pointer hover:shadow-md hover:border-orange-300 transition-all duration-200' : ''
-                }`}
+              <div
+                key={index}
+                className={`flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200 ${isClickable ? 'cursor-pointer hover:shadow-md hover:border-orange-300 transition-all duration-200' : ''
+                  }`}
                 onClick={isClickable ? () => navigate(`/ingredient-detail/${ingredientId}`) : undefined}
               >
                 <div className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-medium mr-3">

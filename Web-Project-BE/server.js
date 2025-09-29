@@ -6,9 +6,11 @@ const rateLimit = require('express-rate-limit');
 const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const path = require('path');
 const connectDB = require('./config/database');
 const authRoutes = require('./routes/auth');
 const recipeRoutes = require('./routes/recipes');
+const ingredientRoutes = require('./routes/ingredients');
 require('./config/passport'); // Load passport config
 
 // Load environment variables
@@ -67,9 +69,13 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Static file serving for images
+app.use('/api/images', express.static(path.join(__dirname, 'public/images')));
+
 // API Routes
 app.use('/api/auth', authLimiter, authRoutes); // Authentication routes
 app.use('/api/recipes', recipeRoutes); // Recipe routes
+app.use('/api/ingredients', ingredientRoutes); // Ingredient routes
 
 // 404 Handling
 app.use('*', (req, res) => {

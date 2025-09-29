@@ -18,7 +18,7 @@ const ingredientsData = [
     name: "Snellman Beef Bones (Marrow or Neck)",
     price: 10.91,
     unit: "700g",
-    image: "/assets/ingredients/Beef Bones.png",
+    image: "/api/images/ingredients/Beef Bones.png",
     sell: true,
     url: {
       "K-market": "https://www.k-ruoka.fi/kauppa/tuote/snellman-luuton-keittoliha-n700/2396229200009",
@@ -39,7 +39,7 @@ const ingredientsData = [
     name: "Snellman Flank Steak",
     price: 14.45,
     unit: "500g",
-    image: "/assets/ingredients/Flank Steak.png",
+    image: "/api/images/ingredients/Flank Steak.png",
     sell: true,
     url: {
       "K-market": "https://www.k-ruoka.fi/kauppa/tuote/snellman-flank-steak-n500g/2396233000008",
@@ -60,7 +60,7 @@ const ingredientsData = [
     name: "Ginger",
     price: 0.89,
     unit: "per piece",
-    image: "/assets/ingredients/Ginger.png",
+    image: "/api/images/ingredients/Ginger.png",
     sell: true,
     url: {
       "K-market": "https://www.k-ruoka.fi/kauppa/tuotehaku?haku=inkivääri&tuote=inkivaari-kg-2000530600006",
@@ -81,7 +81,7 @@ const ingredientsData = [
     name: "Yellow Onion",
     price: 0.13,
     unit: "per piece",
-    image: "/assets/ingredients/Onion.png",
+    image: "/api/images/ingredients/Onion.png",
     sell: true,
     url: {
       "K-market": "https://www.k-ruoka.fi/kauppa/tuotehaku?haku=sipuli&tuote=sipuli-suomi-kg-2000613700005",
@@ -102,7 +102,7 @@ const ingredientsData = [
     name: "Santa Maria Star Anise",
     price: 2.59,
     unit: "per pack",
-    image: "/assets/ingredients/Star Anise.png",
+    image: "/api/images/ingredients/Star Anise.png",
     sell: true,
     url: {
       "K-market": "https://www.k-ruoka.fi/kauppa/tuotehaku?haku=tähtianista&tuote=santa-maria-tahtianis-kokonainen-15g-7311311004926",
@@ -123,7 +123,7 @@ const ingredientsData = [
     name: "Pirkka Cinnamon Stick",
     price: 1.25,
     unit: "per pack",
-    image: "/assets/ingredients/Cinnamon Stick.png",
+    image: "/api/images/ingredients/Cinnamon Stick.png",
     sell: true,
     url: {
       "K-market": "https://www.k-ruoka.fi/kauppa/tuotehaku?haku=Kanelitangot&tuote=pirkka-kanelitanko-15g-6410405255648",
@@ -144,7 +144,7 @@ const ingredientsData = [
     name: "Santa Maria Coriander Seeds",
     price: 1.75,
     unit: "per pack",
-    image: "/assets/ingredients/Coriander Seeds.png",
+    image: "/api/images/ingredients/Coriander Seeds.png",
     sell: true,
     url: {
       "K-market": "",
@@ -165,7 +165,7 @@ const ingredientsData = [
     name: "Meira Cloves",
     price: 1.75,
     unit: "per pack",
-    image: "/assets/ingredients/Cloves.png",
+    image: "/api/images/ingredients/Cloves.png",
     sell: true,
     url: {
       "K-market": "",
@@ -186,7 +186,7 @@ const ingredientsData = [
     name: "Santa Maria Fish Sauce",
     price: 2.25,
     unit: "200ml",
-    image: "/assets/ingredients/Fish Sauce.png",
+    image: "/api/images/ingredients/Fish Sauce.png",
     sell: true,
     url: {
       "K-market": "https://www.k-ruoka.fi/kauppa/tuotehaku?haku=Santa%20Maria%20Kalakastike&tuote=santa-maria-kalakastike-200ml-7311310035280",
@@ -208,7 +208,7 @@ const ingredientsData = [
 const recipesData = [
   {
     title: "Vietnamese Beef Pho",
-    image: "/src/assets/pho receipe.png",
+    image: "/api/images/recipes/pho receipe.png",
     description: "A deeply aromatic and flavorful Vietnamese noodle soup consisting of a slow-simmered beef broth, tender beef slices, and fresh herbs.",
     country: "Vietnam",
     mainIngredient: "Beef",
@@ -256,7 +256,7 @@ const recipesData = [
   },
   {
     title: "Authentic Turkish Döner Kebab (Homemade)",
-    image: "/src/assets/Döner Kebab receipe.png",
+    image: "/api/images/recipes/Döner Kebab receipe.png",
     description: "An authentic recipe for homemade Turkish döner kebab, adapting the traditional method of layered meat for home cooking. The key is to create a dense, flavorful meat loaf that can be thinly sliced, just like the real deal.",
     country: "Turkey",
     mainIngredient: "Ground beef and/or lamb",
@@ -306,7 +306,7 @@ const recipesData = [
   },
   {
     title: "Korean Bulgogi (불고기)",
-    image: "/src/assets/bulgogi receipe.png",
+    image: "/api/images/recipes/bulgogi receipe.png",
     description: "Korean Bulgogi is a classic Korean dish of thinly sliced, marinated beef that's grilled or stir-fried. The name 'bulgogi' literally means 'fire meat' and refers to the traditional method of cooking over an open flame.",
     country: "South Korea",
     mainIngredient: "Beef",
@@ -346,7 +346,7 @@ const recipesData = [
   },
   {
     title: "Kung Pao Chicken (宫保鸡丁)",
-    image: "/src/assets/kungpao receipe.png",
+    image: "/api/images/recipes/kungpao receipe.png",
     description: "Kung Pao Chicken is a classic Sichuan dish known for its bold flavors, combining tender chicken with peanuts, vegetables, and a spicy-sweet sauce. The dish gets its name from Ding Baozhen, a Qing Dynasty official who loved this dish.",
     country: "China",
     mainIngredient: "Chicken",
@@ -390,7 +390,7 @@ const recipesData = [
   },
   {
     title: "Teriyaki Chicken",
-    image: "/src/assets/teriyaki receipe.png",
+    image: "/api/images/recipes/teriyaki receipe.png",
     description: "Teriyaki Chicken is a popular Japanese dish featuring chicken glazed with a sweet and savory teriyaki sauce. The word 'teriyaki' comes from 'teri' (glossy) and 'yaki' (grilled or broiled), referring to the shiny glaze on the meat.",
     country: "Japan",
     mainIngredient: "Chicken",
@@ -432,7 +432,7 @@ const recipesData = [
   },
   {
     title: "Caborana (Traditional Recipe)",
-    image: "/src/assets/caborana receipe.png",
+    image: "/api/images/recipes/caborana receipe.png",
     description: "Caborana is a traditional dish that combines rich flavors and cultural heritage. This recipe brings together authentic ingredients and cooking methods passed down through generations.",
     country: "Traditional",
     mainIngredient: "Mixed",

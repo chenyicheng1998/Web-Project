@@ -1,21 +1,67 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import sKaupatLogo from '../../assets/markets/S-Kaupat.png';
 import kRuokaLogo from '../../assets/markets/K-Ruoka.png';
 import lidlLogo from '../../assets/markets/Lidl.png';
-import { phoIngredients } from '../../data/ingredients';
 
 function IngredientDetail() {
   const navigate = useNavigate();
   const { ingredientId } = useParams();
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [ingredient, setIngredient] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // 从数据中获取ingredient信息
-  const ingredientData = phoIngredients[ingredientId];
+  // 从API获取ingredient数据
+  useEffect(() => {
+    const fetchIngredient = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`http://localhost:5001/api/ingredients/${ingredientId}`);
+
+        if (!response.ok) {
+          throw new Error('Ingredient not found');
+        }
+
+        const ingredientData = await response.json();
+        setIngredient(ingredientData);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (ingredientId) {
+      fetchIngredient();
+    }
+  }, [ingredientId]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <p>Loading ingredient...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <p className="text-red-500">Error: {error}</p>
+        </div>
+      </div>
+    );
+  }
 
   // 如果ingredient不存在，显示错误
-  if (!ingredientData) {
+  if (!ingredient) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto text-center">
@@ -56,10 +102,10 @@ function IngredientDetail() {
   // 添加到购物车（目前只是模拟功能）
   const handleAddToCart = () => {
     setIsAddingToCart(true);
-    
+
     // 模拟添加过程
     setTimeout(() => {
-      alert(`Successfully added ${quantity} ${ingredientData.unit} of ${ingredientData.name} to cart!`);
+      alert(`Successfully added ${quantity} ${ingredient.unit} of ${ingredient.name} to cart!`);
       setIsAddingToCart(false);
     }, 1000);
   };
@@ -96,7 +142,7 @@ function IngredientDetail() {
               <svg className="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
-              <span className="text-gray-800 font-medium">{ingredientData.name}</span>
+              <span className="text-gray-800 font-medium">{ingredient.name}</span>
             </li>
           </ol>
         </nav>
@@ -105,8 +151,8 @@ function IngredientDetail() {
           {/* 左侧 - 商品图片 */}
           <div className="aspect-square">
             <img
-              src={ingredientData.image}
-              alt={ingredientData.name}
+              src={ingredient.image}
+              alt={ingredient.name}
               className="w-full h-full object-cover rounded-lg shadow-lg"
             />
           </div>
@@ -115,23 +161,23 @@ function IngredientDetail() {
           <div className="flex flex-col justify-start space-y-6">
             {/* 商品标题 */}
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-3">{ingredientData.name}</h1>
+              <h1 className="text-3xl font-bold text-gray-800 mb-3">{ingredient.name}</h1>
             </div>
 
             {/* 价格与单位 */}
             <div>
               <div className="flex items-baseline space-x-2">
                 <span className="text-3xl font-bold text-green-600">
-                  €{ingredientData.price.toFixed(2)}
+                  €{ingredient.price.toFixed(2)}
                 </span>
-                <span className="text-lg text-gray-600">/{ingredientData.unit}</span>
+                <span className="text-lg text-gray-600">/{ingredient.unit}</span>
               </div>
             </div>
 
             {/* 商品描述 */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-3">Product Description</h3>
-              <p className="text-gray-600 leading-relaxed">{ingredientData.description}</p>
+              <p className="text-gray-600 leading-relaxed">{ingredient.description}</p>
             </div>
 
             {/* 数量选择器 */}
@@ -156,7 +202,7 @@ function IngredientDetail() {
                     min="1"
                     className="w-20 px-3 py-2 border border-gray-300 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
-                  <span className="text-gray-600">{ingredientData.unit}</span>
+                  <span className="text-gray-600">{ingredient.unit}</span>
                 </div>
 
                 <button
@@ -172,7 +218,7 @@ function IngredientDetail() {
               {/* 总价显示 */}
               <div className="mt-3">
                 <span className="text-sm text-gray-600">
-                  Total: <span className="font-semibold text-gray-800">€{(quantity * ingredientData.price).toFixed(2)}</span>
+                  Total: <span className="font-semibold text-gray-800">€{(quantity * ingredient.price).toFixed(2)}</span>
                 </span>
               </div>
             </div>
@@ -204,42 +250,42 @@ function IngredientDetail() {
 
               {/* 超市购买按钮 - 网格布局 */}
               <div className="grid grid-cols-2 gap-3">
-                {ingredientData.supermarketLinks.sKaupat && (
+                {ingredient.url && ingredient.url["S-market"] && (
                   <button
-                    onClick={() => handleStoreClick(ingredientData.supermarketLinks.sKaupat)}
+                    onClick={() => handleStoreClick(ingredient.url["S-market"])}
                     className="bg-gradient-to-br from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 text-slate-700 font-medium py-2.5 px-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 text-sm shadow-sm hover:shadow-md border border-slate-300"
                   >
-                    <img 
-                      src={sKaupatLogo} 
-                      alt="S-Kaupat" 
+                    <img
+                      src={sKaupatLogo}
+                      alt="S-Kaupat"
                       className="w-4 h-4 object-contain"
                     />
                     <span className="text-xs font-semibold">S-Kaupat</span>
                   </button>
                 )}
 
-                {ingredientData.supermarketLinks.kRuoka && (
+                {ingredient.url && ingredient.url["K-market"] && (
                   <button
-                    onClick={() => handleStoreClick(ingredientData.supermarketLinks.kRuoka)}
+                    onClick={() => handleStoreClick(ingredient.url["K-market"])}
                     className="bg-gradient-to-br from-rose-100 to-rose-200 hover:from-rose-200 hover:to-rose-300 text-rose-700 font-medium py-2.5 px-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 text-sm shadow-sm hover:shadow-md border border-rose-300"
                   >
-                    <img 
-                      src={kRuokaLogo} 
-                      alt="K-Ruoka" 
+                    <img
+                      src={kRuokaLogo}
+                      alt="K-Ruoka"
                       className="w-4 h-4 object-contain"
                     />
                     <span className="text-xs font-semibold">K-Ruoka</span>
                   </button>
                 )}
 
-                {ingredientData.supermarketLinks.lidl && (
+                {ingredient.url && ingredient.url["Lidl"] && (
                   <button
-                    onClick={() => handleStoreClick(ingredientData.supermarketLinks.lidl)}
+                    onClick={() => handleStoreClick(ingredient.url["Lidl"])}
                     className="bg-gradient-to-br from-amber-100 to-amber-200 hover:from-amber-200 hover:to-amber-300 text-amber-700 font-medium py-2.5 px-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 text-sm shadow-sm hover:shadow-md border border-amber-300"
                   >
-                    <img 
-                      src={lidlLogo} 
-                      alt="Lidl" 
+                    <img
+                      src={lidlLogo}
+                      alt="Lidl"
                       className="w-4 h-4 object-contain"
                     />
                     <span className="text-xs font-semibold">Lidl</span>

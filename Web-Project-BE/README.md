@@ -12,6 +12,7 @@
 - ✅ 请求频率限制
 - ✅ 安全中间件
 - ✅ MongoDB 数据库集成
+- ✅ 静态图片服务 (食材和食谱图片)
 
 ## 📁 项目结构
 
@@ -138,6 +139,24 @@ Authorization: Bearer <your-jwt-token>
 ```http
 GET /api/user
 Authorization: Bearer <your-jwt-token>
+```
+
+### 静态图片服务
+
+#### 获取食材图片
+```http
+GET /api/images/ingredients/{图片名称}
+```
+
+#### 获取食谱图片
+```http
+GET /api/images/recipes/{图片名称}
+```
+
+#### 示例
+```http
+GET /api/images/ingredients/Beef%20Bones.png
+GET /api/images/recipes/pho%20receipe.png
 ```
 
 ### 响应格式

@@ -60,6 +60,5 @@ const ingredientSchema = new mongoose.Schema({
 
 // 创建索引
 ingredientSchema.index({ name: 'text', description: 'text' });
-ingredientSchema.index({ id: 1 });
 
 module.exports = mongoose.model('Ingredient', ingredientSchema);
