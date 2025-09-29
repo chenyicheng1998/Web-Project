@@ -330,19 +330,61 @@ function RecipeDetail() {
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Ingredients</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {recipe.ingredients?.map((ingredient, index) => (
-            <div key={index} className="flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <div className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-medium mr-3">
-                {index + 1}
-              </div>
-              <div className="flex-1">
-                <span className="text-gray-800 font-medium">{ingredient.name}</span>
-                {ingredient.quantity && (
-                  <span className="text-gray-600 ml-2">({ingredient.quantity})</span>
+          {recipe.ingredients?.map((ingredient, index) => {
+            // 创建ingredient名称到URL参数的映射
+            const getIngredientId = (name) => {
+              const nameMap = {
+                'fish sauce': 'fish-sauce',
+                'beef bones': 'beef-bones',
+                'flank steak': 'flank-steak',
+                'ginger': 'ginger',
+                'onion': 'onion',
+                'star anise': 'star-anise',
+                'cinnamon stick': 'cinnamon-stick',
+                'coriander': 'coriander',
+                'cloves': 'cloves'
+              };
+              
+              const lowerName = name.toLowerCase();
+              for (const [key, value] of Object.entries(nameMap)) {
+                if (lowerName.includes(key)) {
+                  return value;
+                }
+              }
+              return null;
+            };
+
+            const ingredientId = getIngredientId(ingredient.name);
+            const isClickable = ingredientId !== null;
+            
+            return (
+              <div 
+                key={index} 
+                className={`flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200 ${
+                  isClickable ? 'cursor-pointer hover:shadow-md hover:border-orange-300 transition-all duration-200' : ''
+                }`}
+                onClick={isClickable ? () => navigate(`/ingredient-detail/${ingredientId}`) : undefined}
+              >
+                <div className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-medium mr-3">
+                  {index + 1}
+                </div>
+                <div className="flex-1">
+                  <span className={`font-medium ${isClickable ? 'text-orange-600 hover:text-orange-700' : 'text-gray-800'}`}>
+                    {ingredient.name}
+                    {isClickable && <span className="ml-2 text-xs text-orange-500">(Click for details)</span>}
+                  </span>
+                  {ingredient.quantity && !isClickable && (
+                    <span className="text-gray-600 ml-2">({ingredient.quantity})</span>
+                  )}
+                </div>
+                {isClickable && (
+                  <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

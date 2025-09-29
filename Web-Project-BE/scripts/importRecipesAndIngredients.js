@@ -11,40 +11,21 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 const Recipe = require('../models/Recipe');
 const Ingredient = require('../models/Ingredient');
 
-// 食材数据 - 使用UUID确保全局唯一性
+// 食材数据 - 使用UUID确保全局唯一性 (Pho专用食材)
 const ingredientsData = [
   {
     id: uuidv4(),
-    name: "Atria Chicken Drumsticks",
-    price: 3.99,
-    unit: "800g",
-    image: "",
-    url: {
-      "K-market": "http://placeholder",
-      "S-market": "http://placeholder",
-      "Lidl": "http://placeholder"
-    },
-    description: "Atria chicken drumsticks are easy to prepare in many different ways. Our unseasoned chicken drumsticks are Finnish chicken.",
-    nutrition: {
-      Calories: "126 kcal per 100g",
-      Protein: "18g per 100g",
-      Fat: "6g per 100g",
-      Carbohydrates: "0g per 100g"
-    },
-    additionalInfo: "<h3>Product Details</h3>\n<p><strong>Ingredients:</strong> chicken drumstick</p>\n<p><strong>Country of manufacture:</strong> Finland</p>\n<p><strong>Manufacturer:</strong> Atria Suomi Oy, PL 900, 60060 ATRIA</p>\n<p><strong>EAN code:</strong> 6407810014120</p>\n<p><strong>Storage instructions:</strong> Store below +6 °C</p>\n<p><strong>Nutritional Attributes:</strong></p>\n<ul>\n  <li>Lactose-free</li>\n</ul>"
-  },
-  {
-    id: uuidv4(),
-    name: "Beef bones",
+    name: "Snellman Beef Bones (Marrow or Neck)",
     price: 10.91,
     unit: "700g",
-    image: "add image",
+    image: "/assets/ingredients/Beef Bones.png",
+    sell: true,
     url: {
-      "K-market": "http://placeholder",
-      "S-market": "http://placeholder",
-      "Lidl": "http://placeholder"
+      "K-market": "https://www.k-ruoka.fi/kauppa/tuote/snellman-luuton-keittoliha-n700/2396229200009",
+      "S-market": "https://www.s-kaupat.fi/tuote/snellman-luuton-keittoliha-n700/2396229200009",
+      "Lidl": ""
     },
-    description: "Boneless stew meat from fresh, Finnish beef chuck.",
+    description: "Finnish beef, high-quality and fresh, suitable for various cooking purposes.",
     nutrition: {
       Calories: "143 kcal per 100g",
       Protein: "19.5g per 100g",
@@ -55,83 +36,171 @@ const ingredientsData = [
   },
   {
     id: uuidv4(),
-    name: "Unseasoned Chicken Fillet",
-    price: 7.28,
-    unit: "530g",
-    image: "",
+    name: "Snellman Flank Steak",
+    price: 14.45,
+    unit: "500g",
+    image: "/assets/ingredients/Flank Steak.png",
+    sell: true,
     url: {
-      "K-market": "http://placeholder",
-      "S-market": "http://placeholder",
-      "Lidl": "http://placeholder"
+      "K-market": "https://www.k-ruoka.fi/kauppa/tuote/snellman-flank-steak-n500g/2396233000008",
+      "S-market": "https://www.s-kaupat.fi/tuote/snellman-flank-steak-n500g/2396233000008",
+      "Lidl": ""
     },
-    description: "Unseasoned chicken fillet. The origin of the chicken is Finland.",
+    description: "Premium Finnish flank steak, fresh and versatile for different dishes.",
     nutrition: {
-      Calories: "105 kcal per 100g",
-      Protein: "22g per 100g",
-      Fat: "1.8g per 100g",
+      Calories: "143 kcal per 100g",
+      Protein: "19.5g per 100g",
+      Fat: "7g per 100g",
       Carbohydrates: "0g per 100g"
     },
-    additionalInfo: "<h3>Product Information</h3>\n<p><strong>Ingredients:</strong> chicken fillet</p>\n<p><strong>Country of Manufacture:</strong> Finland</p>\n<p><strong>Manufacturer:</strong> Naapurin Maalaiskana Oy</p>\n<p><strong>Commissioned by:</strong> SOK, PO Box 35, FI-00088 S Group</p>\n<p><strong>EAN code:</strong> 6414893501508</p>\n<p>We actively update the product information. However, we recommend that you always check the ingredients on the product packaging as well.</p>\n<p><strong>Storage instructions:</strong> Store below +6°C</p>\n<p><strong>Instructions for use:</strong> Must be cooked before consumption.</p>"
+    additionalInfo: "<p><strong>Storage Instructions:</strong> Store in the refrigerator at +2-+6 °C</p><p><strong>Instructions for use:</strong> Must be cooked before use.</p><p><strong>Manufacturer:</strong> Snellmanin Lihanjalostus Oy</p><p><strong>Country of Manufacture:</strong> Finland</p>"
   },
   {
     id: uuidv4(),
-    name: "Snellman's Beef Sirloin",
-    price: 10.29,
-    unit: "240g",
-    image: "",
+    name: "Ginger",
+    price: 0.89,
+    unit: "per piece",
+    image: "/assets/ingredients/Ginger.png",
+    sell: true,
     url: {
-      "K-market": "http://xxxxxx",
-      "S-market": "http://xxxxxx",
-      "Lidl": "http://xxxxxx"
+      "K-market": "https://www.k-ruoka.fi/kauppa/tuotehaku?haku=inkivääri&tuote=inkivaari-kg-2000530600006",
+      "S-market": "",
+      "Lidl": ""
     },
-    description: "The beef sirloin is carefully cut and cleaned from membranes by hand. After this, the steaks are pounded very thin and arranged...",
+    description: "Fresh ginger root, essential for Vietnamese cuisine.",
     nutrition: {
-      Calories: "522 kJ / 124 kcal per 100g",
-      Fat: "4g per 100g",
-      Carbohydrates: "0g per 100g",
-      Protein: "21.5g per 100g"
+      Calories: "80 kcal per 100g",
+      Protein: "1.8g per 100g",
+      Fat: "0.8g per 100g",
+      Carbohydrates: "17.8g per 100g"
     },
-    additionalInfo: "<p><strong>Country of Manufacture:</strong> Finland</p><p><strong>Ingredients:</strong> Finnish beef. Origin: Finland, Slaughtered: 62, Cut: Finland 62.</p><p><strong>Manufacturer:</strong> Snellmanin Lihanjalostus Oy</p><p><strong>EAN:</strong> 6409620014413</p><p><strong>Storage Instructions:</strong> Store in a refrigerator at +2-+6 °C</p><p><strong>Instructions for use:</strong> Must be cooked before use.</p><p>We actively update the service's product information. However, we recommend that you always check the ingredients on the sales package.</p>"
+    additionalInfo: "<p><strong>Storage Instructions:</strong> Store in a cool, dry place</p><p><strong>Country of Origin:</strong> Various</p>"
   },
   {
     id: uuidv4(),
-    name: "Atria's Better Beef Ground",
-    price: 4.99,
-    unit: "400g",
-    image: "kebab ingredient",
+    name: "Yellow Onion",
+    price: 0.13,
+    unit: "per piece",
+    image: "/assets/ingredients/Onion.png",
+    sell: true,
     url: {
-      "K-market": "http://xxxxxx",
-      "S-market": "http://xxxxxx",
-      "Lidl": "http://xxxxxx"
+      "K-market": "https://www.k-ruoka.fi/kauppa/tuotehaku?haku=sipuli&tuote=sipuli-suomi-kg-2000613700005",
+      "S-market": "",
+      "Lidl": ""
     },
-    description: "Atria's Better Beef Ground is suitable for people who want to eat low-fat, but flavorful food. The low 10% fat content of the ground beef consists of…",
+    description: "Fresh yellow onions, perfect for Vietnamese pho broth.",
     nutrition: {
-      Calories: "168 kcal per 100g",
-      Protein: "20g per 100g",
-      Fat: "10g per 100g",
-      Carbohydrate: "0g per 100g"
+      Calories: "40 kcal per 100g",
+      Protein: "1.1g per 100g",
+      Fat: "0.1g per 100g",
+      Carbohydrates: "9.3g per 100g"
     },
-    additionalInfo: "<p><strong>Country of Manufacture:</strong> Finland</p><p><strong>Ingredients:</strong> BEEF 100 %</p><p><strong>Manufacturer Information:</strong> Atria Suomi Oy, PL 900, 60060 ATRIA</p><p><strong>EAN:</strong> 6407840041172</p><p><strong>Storage Instructions:</strong> Store below +4 °C</p><p>We actively update our service's product information. However, we recommend you always check the ingredients on the sales package.</p>"
+    additionalInfo: "<p><strong>Storage Instructions:</strong> Store in a cool, dry place</p><p><strong>Country of Origin:</strong> Finland</p>"
   },
   {
     id: uuidv4(),
-    name: "Negrini sliced Guanciale",
-    price: 4.75,
-    unit: "80g",
-    image: "",
+    name: "Santa Maria Star Anise",
+    price: 2.59,
+    unit: "per pack",
+    image: "/assets/ingredients/Star Anise.png",
+    sell: true,
     url: {
-      "K-market": "http://xxxxxx",
-      "S-market": "http://xxxxxx",
-      "Lidl": "http://xxxxxx"
+      "K-market": "https://www.k-ruoka.fi/kauppa/tuotehaku?haku=tähtianista&tuote=santa-maria-tahtianis-kokonainen-15g-7311311004926",
+      "S-market": "",
+      "Lidl": ""
     },
-    description: "Negrini sliced Guanciale is a rich and juicy meat that is ideal for serving with a variety of pasta dishes and vegetables. Negrini is an Italian company that produces traditional Italian salami and hams with more than 65 years of expertise.",
+    description: "Whole star anise pods, essential spice for Vietnamese pho.",
     nutrition: {
-      Calories: "619 kcal per 100g",
-      Protein: "12g per 100g",
-      Fat: "63g per 100g",
-      Carbohydrates: "0.9g per 100g"
+      Calories: "337 kcal per 100g",
+      Protein: "17.6g per 100g",
+      Fat: "15.9g per 100g",
+      Carbohydrates: "50.0g per 100g"
     },
-    additionalInfo: "<p><strong>Nutritional Attributes:</strong></p><ul><li>Glutenfree</li><li>High salt, high sodium</li><li>Free from lactose</li></ul><p><strong>Ingredients:</strong></p><p>Pork cheek, salt, dextrose, spices, natural flavorings, antioxidant (E301), preservatives (E250, E252).</p><p><strong>Allergens:</strong></p><p>Does not contain Lupine and their derivatives in the product, Crustaceans and their derivatives, Soybeans and its derivatives. We recommend that you always check the allergen information on the product packaging.</p><p><strong>E numbers:</strong> E250, E301, E252</p><p><strong>Storage and use instructions:</strong> Store in a cool place +0°C to +4°C</p><p><strong>Country of origin/country of manufacture:</strong> Italy</p><p><strong>Importer:</strong> PNM-Chipsters Oy, Päiväläisentie 2, FI-00390 Helsinki, www.pnmchipsters.fi</p><p><strong>EAN code:</strong> 8003948004316</p>"
+    additionalInfo: "<p><strong>Storage Instructions:</strong> Store in a cool, dry place</p><p><strong>Country of Origin:</strong> Various</p>"
+  },
+  {
+    id: uuidv4(),
+    name: "Pirkka Cinnamon Stick",
+    price: 1.25,
+    unit: "per pack",
+    image: "/assets/ingredients/Cinnamon Stick.png",
+    sell: true,
+    url: {
+      "K-market": "https://www.k-ruoka.fi/kauppa/tuotehaku?haku=Kanelitangot&tuote=pirkka-kanelitanko-15g-6410405255648",
+      "S-market": "",
+      "Lidl": ""
+    },
+    description: "Cinnamon sticks for authentic Vietnamese pho flavor.",
+    nutrition: {
+      Calories: "247 kcal per 100g",
+      Protein: "4.0g per 100g",
+      Fat: "1.2g per 100g",
+      Carbohydrates: "80.6g per 100g"
+    },
+    additionalInfo: "<p><strong>Storage Instructions:</strong> Store in a cool, dry place</p><p><strong>Country of Origin:</strong> Various</p>"
+  },
+  {
+    id: uuidv4(),
+    name: "Santa Maria Coriander Seeds",
+    price: 1.75,
+    unit: "per pack",
+    image: "/assets/ingredients/Coriander Seeds.png",
+    sell: true,
+    url: {
+      "K-market": "",
+      "S-market": "",
+      "Lidl": ""
+    },
+    description: "Coriander seeds for Vietnamese pho spice blend.",
+    nutrition: {
+      Calories: "298 kcal per 100g",
+      Protein: "12.4g per 100g",
+      Fat: "17.8g per 100g",
+      Carbohydrates: "54.9g per 100g"
+    },
+    additionalInfo: "<p><strong>Storage Instructions:</strong> Store in a cool, dry place</p><p><strong>Country of Origin:</strong> Various</p>"
+  },
+  {
+    id: uuidv4(),
+    name: "Meira Cloves",
+    price: 1.75,
+    unit: "per pack",
+    image: "/assets/ingredients/Cloves.png",
+    sell: true,
+    url: {
+      "K-market": "",
+      "S-market": "https://www.s-kaupat.fi/tuote/meira-neilikka-jauhettu-30g/6414200136904",
+      "Lidl": ""
+    },
+    description: "Whole cloves for Vietnamese pho spice blend.",
+    nutrition: {
+      Calories: "274 kcal per 100g",
+      Protein: "6.0g per 100g",
+      Fat: "13.0g per 100g",
+      Carbohydrates: "65.5g per 100g"
+    },
+    additionalInfo: "<p><strong>Storage Instructions:</strong> Store in a cool, dry place</p><p><strong>Country of Origin:</strong> Various</p>"
+  },
+  {
+    id: uuidv4(),
+    name: "Santa Maria Fish Sauce",
+    price: 2.25,
+    unit: "200ml",
+    image: "/assets/ingredients/Fish Sauce.png",
+    sell: true,
+    url: {
+      "K-market": "https://www.k-ruoka.fi/kauppa/tuotehaku?haku=Santa%20Maria%20Kalakastike&tuote=santa-maria-kalakastike-200ml-7311310035280",
+      "S-market": "https://www.s-kaupat.fi/tuote/santa-maria-kalakastike-200-ml/7311310035280",
+      "Lidl": ""
+    },
+    description: "Authentic fish sauce, essential for Vietnamese cuisine.",
+    nutrition: {
+      Calories: "66 kcal per 100g",
+      Protein: "10.0g per 100g",
+      Fat: "0.0g per 100g",
+      Carbohydrates: "6.5g per 100g"
+    },
+    additionalInfo: "<p><strong>Storage Instructions:</strong> Store in a cool, dry place</p><p><strong>Country of Origin:</strong> Various</p>"
   }
 ];
 
@@ -147,19 +216,19 @@ const recipesData = [
     cookTime: "3 - 8 hours",
     rating: 4.8,
     ingredients: [
-      { id: ingredientsData[1].id, name: "Beef bones (marrow or neck)", quantity: "2-3 kg" },
-      { id: uuidv4(), name: "Beef brisket or flank steak", quantity: "1-1.5 kg" },
-      { id: uuidv4(), name: "Ginger", quantity: "2 large pieces" },
-      { id: uuidv4(), name: "Yellow onions", quantity: "2 large" },
-      { id: uuidv4(), name: "Star anise", quantity: "6-10" },
-      { id: uuidv4(), name: "Cinnamon sticks", quantity: "2-3" },
+      { id: ingredientsData[0].id, name: "Beef bones (marrow or neck)", quantity: "2-3 kg" },
+      { id: ingredientsData[1].id, name: "Beef brisket or flank steak", quantity: "1-1.5 kg" },
+      { id: ingredientsData[2].id, name: "Ginger", quantity: "2 large pieces" },
+      { id: ingredientsData[3].id, name: "Yellow onions", quantity: "2 large" },
+      { id: ingredientsData[4].id, name: "Star anise", quantity: "6-10" },
+      { id: ingredientsData[5].id, name: "Cinnamon sticks", quantity: "2-3" },
       { id: uuidv4(), name: "Black cardamom pods", quantity: "2-3" },
-      { id: uuidv4(), name: "Coriander seeds", quantity: "1 tbsp" },
-      { id: uuidv4(), name: "Cloves", quantity: "3-6" },
-      { id: uuidv4(), name: "Fish sauce", quantity: "to taste" },
+      { id: ingredientsData[6].id, name: "Coriander seeds", quantity: "1 tbsp" },
+      { id: ingredientsData[7].id, name: "Cloves", quantity: "3-6" },
+      { id: ingredientsData[8].id, name: "Fish sauce", quantity: "to taste" },
       { id: uuidv4(), name: "Rock sugar or regular sugar", quantity: "to taste" },
       { id: uuidv4(), name: "Flat rice noodles", quantity: "200-250g per serving" },
-      { id: ingredientsData[3].id, name: "Raw eye of round steak (thinly sliced)", quantity: "100g per serving" },
+      { id: uuidv4(), name: "Raw eye of round steak (thinly sliced)", quantity: "100g per serving" },
       { id: uuidv4(), name: "Fresh herbs (Thai basil, mint, cilantro)", quantity: "for garnish" },
       { id: uuidv4(), name: "Limes, sliced chilies, bean sprouts", quantity: "for garnish" }
     ],
@@ -195,7 +264,7 @@ const recipesData = [
     cookTime: "5-6 hours (includes freezing time)",
     rating: 4.8,
     ingredients: [
-      { id: ingredientsData[4].id, name: "Ground beef or lamb (at least 15% fat)", quantity: "1 kg" },
+      { id: uuidv4(), name: "Ground beef or lamb (at least 15% fat)", quantity: "1 kg" },
       { id: uuidv4(), name: "Plain yogurt", quantity: "2 tbsp" },
       { id: uuidv4(), name: "Onion juice (from 1 grated large onion)", quantity: "to taste" },
       { id: uuidv4(), name: "Thyme (fresh or dried)", quantity: "1 tsp" },
@@ -245,7 +314,7 @@ const recipesData = [
     cookTime: "30 minutes (plus marinating time)",
     rating: 4.9,
     ingredients: [
-      { id: ingredientsData[3].id, name: "Beef sirloin or ribeye (thinly sliced)", quantity: "500g" },
+      { id: uuidv4(), name: "Beef sirloin or ribeye (thinly sliced)", quantity: "500g" },
       { id: uuidv4(), name: "Soy sauce", quantity: "1/4 cup" },
       { id: uuidv4(), name: "Brown sugar", quantity: "2 tbsp" },
       { id: uuidv4(), name: "Sesame oil", quantity: "1 tbsp" },
@@ -285,7 +354,7 @@ const recipesData = [
     cookTime: "20 minutes",
     rating: 4.7,
     ingredients: [
-      { id: ingredientsData[2].id, name: "Chicken breast (diced)", quantity: "500g" },
+      { id: uuidv4(), name: "Chicken breast (diced)", quantity: "500g" },
       { id: uuidv4(), name: "Soy sauce", quantity: "2 tbsp" },
       { id: uuidv4(), name: "Shaoxing wine or dry sherry", quantity: "1 tbsp" },
       { id: uuidv4(), name: "Cornstarch", quantity: "1 tsp" },
@@ -329,7 +398,7 @@ const recipesData = [
     cookTime: "25 minutes",
     rating: 4.6,
     ingredients: [
-      { id: ingredientsData[0].id, name: "Chicken thighs (boneless, skin-on)", quantity: "6 pieces" },
+      { id: uuidv4(), name: "Chicken thighs (boneless, skin-on)", quantity: "6 pieces" },
       { id: uuidv4(), name: "Soy sauce", quantity: "1/2 cup" },
       { id: uuidv4(), name: "Mirin (sweet rice wine)", quantity: "1/4 cup" },
       { id: uuidv4(), name: "Sake or dry white wine", quantity: "1/4 cup" },
