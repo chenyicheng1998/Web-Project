@@ -10,55 +10,41 @@ const googleCallback = async (req, res) => {
 
     const { id, displayName, emails, photos } = req.user;
     const email = emails[0].value;
-    const avatar = photos[0]?.value || null;
 
-    // 查找或创建用户
-    let user = await User.findOne({ googleId: id });
+    // 首先查找是否已有相同邮箱的用户
+    let user = await User.findOne({ email });
 
     if (!user) {
-      // 检查邮箱是否已被其他用户使用
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        // 如果邮箱已存在但不是Google用户，更新为Google用户
-        if (existingUser.provider === 'local') {
-          existingUser.googleId = id;
-          existingUser.provider = 'google';
-          existingUser.avatar = avatar;
-          await existingUser.save();
-          user = existingUser;
-        } else {
-          return res.redirect(`${process.env.FRONTEND_URL}/#/login?error=email_already_exists`);
-        }
-      } else {
-        // 创建新的Google用户
-        user = new User({
-          username: displayName || email.split('@')[0],
-          email,
-          googleId: id,
-          provider: 'google',
-          avatar,
-          isEmailVerified: true // Google邮箱默认已验证
-        });
-        await user.save();
-      }
-    } else {
-      // 更新用户信息
-      user.avatar = avatar;
+      // 邮箱不存在，创建新的Google用户
+      user = new User({
+        username: displayName || email.split('@')[0],
+        email,
+        googleId: id,
+        authMethods: ['google']
+      });
       await user.save();
+      console.log('创建新的Google用户:', user.email);
+    } else {
+      // 邮箱已存在，合并Google认证
+      if (!user.googleId) {
+        // 用户之前只有本地认证，现在添加Google认证
+        await user.mergeGoogleAccount(id, email);
+        console.log('将Google认证合并到现有账户:', user.email);
+      } else if (user.googleId !== id) {
+        // 邮箱已经被其他Google账户使用
+        return res.redirect(`${process.env.FRONTEND_URL}/#/login?error=email_already_linked_to_different_google_account`);
+      }
+      // 如果 googleId 相同，则是同一个用户，无需操作
     }
 
     // 生成JWT token
     const token = generateToken(user._id);
-
-    // 更新最后登录时间
-    await user.updateLastLogin();
 
     // 重定向到前端，携带token
     res.redirect(`${process.env.FRONTEND_URL}/#/login?token=${token}&success=google_login`);
 
   } catch (error) {
     console.error('Google callback error:', error);
-    // 修复：错误情况下不使用未定义的token变量
     res.redirect(`${process.env.FRONTEND_URL}/#/login?error=google_auth_failed`);
   }
 };
@@ -95,8 +81,7 @@ const verifyGoogleToken = async (req, res) => {
         id: user._id,
         username: user.username,
         email: user.email,
-        provider: user.provider,
-        avatar: user.avatar
+        authMethods: user.authMethods
       }
     });
 

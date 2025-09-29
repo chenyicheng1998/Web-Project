@@ -21,36 +21,28 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: function () {
-      // 密码对于本地注册用户是必需的，对于OAuth用户是可选的
-      return this.provider === 'local';
+      // 如果用户没有Google ID，则密码是必需的
+      // 如果有Google ID，密码是可选的（允许后续设置）
+      return !this.googleId;
     },
     minlength: [6, 'Password must be at least 6 characters long']
   },
-  provider: {
+  // 用户支持的登录方式（可以同时支持多种）
+  authMethods: [{
     type: String,
-    enum: ['local', 'google'],
-    default: 'local'
-  },
+    enum: ['local', 'google']
+  }],
   googleId: {
-    type: String,
-    sparse: true // 允许多个文档没有此字段
-  },
-  avatar: {
-    type: String,
-    default: null
-  },
-  isEmailVerified: {
-    type: Boolean,
-    default: false
-  },
-  lastLogin: {
-    type: Date,
-    default: null
+    type: String
   },
   bookmarkedRecipes: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Recipe'
-  }]
+  }],
+  // shoppingCart: [{
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'ShoppingCart'
+  // }]
 }, {
   timestamps: true // 自动添加 createdAt 和 updatedAt
 });
@@ -72,12 +64,28 @@ userSchema.pre('save', async function (next) {
 
 // 比较密码的方法
 userSchema.methods.comparePassword = async function (candidatePassword) {
+  if (!this.password) {
+    return false; // 没有设置密码的用户无法进行密码验证
+  }
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// 更新最后登录时间
-userSchema.methods.updateLastLogin = function () {
-  this.lastLogin = new Date();
+// 添加认证方式
+userSchema.methods.addAuthMethod = function (method) {
+  if (!this.authMethods.includes(method)) {
+    this.authMethods.push(method);
+  }
+};
+
+// 检查是否支持某种认证方式
+userSchema.methods.supportsAuthMethod = function (method) {
+  return this.authMethods.includes(method);
+};
+
+// 合并Google账户
+userSchema.methods.mergeGoogleAccount = function (googleId, googleEmail) {
+  this.googleId = googleId;
+  this.addAuthMethod('google');
   return this.save();
 };
 

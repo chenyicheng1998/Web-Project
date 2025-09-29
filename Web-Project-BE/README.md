@@ -151,9 +151,7 @@ Authorization: Bearer <your-jwt-token>
     "id": "64f1a2b3c4d5e6f7g8h9i0j1",
     "username": "testuser",
     "email": "test@example.com",
-    "provider": "local",
-    "avatar": null,
-    "lastLogin": "2024-01-15T10:30:00.000Z"
+    "authMethods": ["local"]
   }
 }
 ```
@@ -193,12 +191,10 @@ Authorization: Bearer <your-jwt-token>
 {
   username: String,        // 用户名（唯一）
   email: String,          // 邮箱（唯一）
-  password: String,       // 加密密码（仅本地用户）
-  provider: String,       // 认证提供商：'local' | 'google'
-  googleId: String,       // Google 用户 ID
-  avatar: String,         // 头像 URL
-  isEmailVerified: Boolean, // 邮箱验证状态
-  lastLogin: Date,        // 最后登录时间
+  password: String,       // 加密密码（本地用户必需，Google用户可选）
+  authMethods: [String],  // 支持的认证方式：['local', 'google']
+  googleId: String,       // Google 用户 ID（可选）
+  bookmarkedRecipes: [ObjectId], // 收藏的食谱
   createdAt: Date,        // 创建时间
   updatedAt: Date         // 更新时间
 }
@@ -208,6 +204,24 @@ Authorization: Bearer <your-jwt-token>
 
 - **密码加密**：使用 bcrypt 加密存储密码
 - **JWT 认证**：安全的 token 认证机制
+- **统一账户系统**：同一邮箱支持Google和本地双重认证
+- **智能账户合并**：自动合并重复邮箱的认证方式
+
+## 🎯 用户认证流程
+
+### 场景1：先Google登录，后本地注册
+1. 用户通过Google登录 → 创建账户 `{authMethods: ['google']}`
+2. 用户用同一邮箱进行本地注册 → 自动为Google账户添加密码 `{authMethods: ['google', 'local']}`
+3. 现在用户可以用两种方式登录同一账户
+
+### 场景2：先本地注册，后Google登录  
+1. 用户本地注册 → 创建账户 `{authMethods: ['local']}`
+2. 用户用同一邮箱Google登录 → 自动合并认证方式 `{authMethods: ['local', 'google']}`
+3. 现在用户可以用两种方式登录同一账户
+
+### 场景3：重复邮箱冲突
+- 如果邮箱已有完整的本地账户（有密码），拒绝重复注册
+- 如果邮箱只有Google认证（无密码），允许添加本地认证
 - **请求限制**：防止暴力攻击的频率限制
 - **输入验证**：使用 express-validator 验证输入
 - **CORS 配置**：限制跨域请求来源

@@ -1,7 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { UserContext } from "../../contexts/UserContext.jsx";
 
 function Signin() {
+  const { login } = useContext(UserContext);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -39,11 +41,29 @@ function Signin() {
         const data = await response.json();
         localStorage.setItem('authToken', data.token);
         console.log('Signup successful', data);
-        alert('Account created successfully! Please log in.');
-        navigate('/login');
+
+        // 区分新注册和为Google账户添加密码的情况
+        if (data.message.includes('Local authentication added')) {
+          // 为Google账户添加了密码
+          login(data.user, data.token);
+          alert('Password successfully added to your Google account! You can now login with either Google or email/password.');
+          navigate('/');
+        } else {
+          // 新账户注册
+          alert('Account created successfully! Please log in.');
+          navigate('/login');
+        }
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Signup failed. Please try again.');
+
+        // 提供更友好的错误信息
+        if (errorData.code === 'EMAIL_EXISTS') {
+          alert('This email is already registered with a password. Please try logging in instead.');
+        } else if (errorData.code === 'USERNAME_EXISTS') {
+          alert('This username is already taken. Please choose a different username.');
+        } else {
+          alert(errorData.message || 'Signup failed. Please try again.');
+        }
       }
     } catch (error) {
       console.error('Request Error:', error);

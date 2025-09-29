@@ -41,16 +41,16 @@ router.post('/signup', registerValidation, register);
 router.post('/login', loginValidation, login);
 
 // Google OAuth 路由
-router.get('/google', 
-  passport.authenticate('google', { 
-    scope: ['profile', 'email'] 
+router.get('/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email']
   })
 );
 
-router.get('/google/callback', 
-  passport.authenticate('google', { 
-    failureRedirect: `${process.env.FRONTEND_URL}/login?error=google_auth_failed` 
-  }), 
+router.get('/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: `${process.env.FRONTEND_URL}/login?error=google_auth_failed`
+  }),
   googleCallback
 );
 

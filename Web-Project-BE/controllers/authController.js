@@ -16,35 +16,58 @@ const register = async (req, res) => {
 
     const { username, email, password } = req.body;
 
-    // 检查用户是否已存在
-    const existingUser = await User.findOne({
-      $or: [{ email }, { username }]
-    });
-
-    if (existingUser) {
+    // 检查用户名是否已存在
+    const existingUserByUsername = await User.findOne({ username });
+    if (existingUserByUsername) {
       return res.status(409).json({
-        message: existingUser.email === email
-          ? 'Email already registered'
-          : 'Username already taken',
-        code: 'USER_EXISTS'
+        message: 'Username already taken',
+        code: 'USERNAME_EXISTS'
       });
     }
 
-    // 创建新用户
+    // 检查邮箱是否已存在
+    const existingUserByEmail = await User.findOne({ email });
+
+    if (existingUserByEmail) {
+      // 如果邮箱已存在但只有Google认证（没有本地密码），允许添加本地认证
+      if (existingUserByEmail.googleId && !existingUserByEmail.password) {
+        // 为现有Google用户添加本地认证
+        existingUserByEmail.password = password;
+        existingUserByEmail.addAuthMethod('local');
+        await existingUserByEmail.save();
+
+        const token = generateToken(existingUserByEmail._id);
+
+        return res.status(200).json({
+          message: 'Local authentication added to existing Google account',
+          token,
+          user: {
+            id: existingUserByEmail._id,
+            username: existingUserByEmail.username,
+            email: existingUserByEmail.email,
+            authMethods: existingUserByEmail.authMethods,
+            createdAt: existingUserByEmail.createdAt
+          }
+        });
+      } else {
+        // 邮箱已被其他账户使用（有本地密码或没有Google ID）
+        return res.status(409).json({
+          message: 'Email already registered',
+          code: 'EMAIL_EXISTS'
+        });
+      }
+    }    // 创建新用户
     const user = new User({
       username,
       email,
       password,
-      provider: 'local'
+      authMethods: ['local']
     });
 
     await user.save();
 
     // 生成JWT token
     const token = generateToken(user._id);
-
-    // 更新最后登录时间
-    await user.updateLastLogin();
 
     res.status(201).json({
       message: 'User registered successfully',
@@ -53,7 +76,7 @@ const register = async (req, res) => {
         id: user._id,
         username: user.username,
         email: user.email,
-        provider: user.provider,
+        authMethods: user.authMethods,
         createdAt: user.createdAt
       }
     });
@@ -102,9 +125,6 @@ const login = async (req, res) => {
     // 生成JWT token
     const token = generateToken(user._id);
 
-    // 更新最后登录时间
-    await user.updateLastLogin();
-
     res.json({
       message: 'Login successful',
       token,
@@ -112,9 +132,7 @@ const login = async (req, res) => {
         id: user._id,
         username: user.username,
         email: user.email,
-        provider: user.provider,
-        avatar: user.avatar,
-        lastLogin: user.lastLogin
+        authMethods: user.authMethods
       }
     });
 
@@ -137,10 +155,7 @@ const getCurrentUser = async (req, res) => {
       id: user._id,
       username: user.username,
       email: user.email,
-      provider: user.provider,
-      avatar: user.avatar,
-      isEmailVerified: user.isEmailVerified,
-      lastLogin: user.lastLogin,
+      authMethods: user.authMethods,
       createdAt: user.createdAt,
       bookmarkedRecipes: user.bookmarkedRecipes
     });
@@ -163,7 +178,7 @@ const verifyToken = async (req, res) => {
         id: req.user._id,
         username: req.user.username,
         email: req.user.email,
-        provider: req.user.provider
+        authMethods: req.user.authMethods
       }
     });
   } catch (error) {
