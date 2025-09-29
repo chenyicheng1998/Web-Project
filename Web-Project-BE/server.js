@@ -11,6 +11,7 @@ const connectDB = require('./config/database');
 const authRoutes = require('./routes/auth');
 const recipeRoutes = require('./routes/recipes');
 const ingredientRoutes = require('./routes/ingredients');
+const cartRoutes = require('./routes/cart');
 require('./config/passport'); // Load passport config
 
 // Load environment variables
@@ -76,6 +77,7 @@ app.use('/api/images', express.static(path.join(__dirname, 'public/images')));
 app.use('/api/auth', authLimiter, authRoutes); // Authentication routes
 app.use('/api/recipes', recipeRoutes); // Recipe routes
 app.use('/api/ingredients', ingredientRoutes); // Ingredient routes
+app.use('/api/cart', cartRoutes); // Cart routes
 
 // 404 Handling
 app.use('*', (req, res) => {

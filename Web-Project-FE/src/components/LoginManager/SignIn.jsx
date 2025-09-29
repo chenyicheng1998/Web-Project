@@ -25,7 +25,7 @@ function Signin() {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5001/api/auth/signup', {
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,7 +39,6 @@ function Signin() {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('authToken', data.token);
         console.log('Signup successful', data);
 
         // 区分新注册和为Google账户添加密码的情况
@@ -49,9 +48,10 @@ function Signin() {
           alert('Password successfully added to your Google account! You can now login with either Google or email/password.');
           navigate('/');
         } else {
-          // 新账户注册
-          alert('Account created successfully! Please log in.');
-          navigate('/login');
+          // 新用户注册
+          login(data.user, data.token);
+          alert('Registration successful! Welcome to CookEase!');
+          navigate('/');
         }
       } else {
         const errorData = await response.json();

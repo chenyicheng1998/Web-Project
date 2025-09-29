@@ -39,10 +39,37 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Recipe'
   }],
-  // shoppingCart: [{
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'ShoppingCart'
-  // }]
+  shoppingCart: [{
+    ingredientId: {
+      type: String,
+      required: true
+    },
+    name: {
+      type: String,
+      required: true
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1
+    },
+    unit: {
+      type: String,
+      required: true
+    },
+    price: {
+      type: Number,
+      required: true
+    },
+    image: {
+      type: String,
+      default: ""
+    },
+    addedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }]
 }, {
   timestamps: true // 自动添加 createdAt 和 updatedAt
 });

@@ -1,8 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
+import { UserContext } from "../../contexts/UserContext";
+import sKaupatLogo from '../../assets/markets/S-Kaupat.png';
+import kRuokaLogo from '../../assets/markets/K-Ruoka.png';
+import lidlLogo from '../../assets/markets/Lidl.png';
 
 function Ingredient() {
-  const { ingredientId } = useParams();
+  const { id: ingredientId } = useParams();
+  const { user } = useContext(UserContext);
   const [ingredient, setIngredient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,7 +19,7 @@ function Ingredient() {
     const fetchIngredient = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/ingredients/${ingredientId}`);
+        const response = await fetch(`/api/ingredients/${ingredientId}`);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -51,12 +56,25 @@ function Ingredient() {
     }
   };
 
+  // 跳转到超市购买
+  const handleStoreClick = (storeUrl) => {
+    if (storeUrl) {
+      window.open(storeUrl, '_blank');
+    }
+  };
+
   // 加入购物车
   const handleAddToCart = async () => {
     try {
+      // 检查用户是否登录
+      if (!user) {
+        alert('请先登录才能添加商品到购物车');
+        return;
+      }
+
       setIsAddingToCart(true);
 
-      const response = await fetch('http://localhost:5000/api/cart/add', {
+      const response = await fetch('/api/cart/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,12 +90,14 @@ function Ingredient() {
       if (response.ok) {
         // 显示成功消息
         alert(`Successfully added ${quantity}${ingredient.unit} of ${ingredient.name} to cart!`);
+
+        // 触发购物车更新事件
+        window.dispatchEvent(new CustomEvent('cartUpdated'));
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to add to cart');
       }
     } catch (error) {
-      console.error('Error adding to cart:', error);
       alert('Failed to add item to cart. Please try again.');
     } finally {
       setIsAddingToCart(false);
@@ -242,8 +262,11 @@ function Ingredient() {
             {/* 加入购物车按钮 */}
             <button
               onClick={handleAddToCart}
-              disabled={isAddingToCart}
-              className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2"
+              disabled={isAddingToCart || !user}
+              className={`w-full font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 ${!user
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                : 'bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white'
+                }`}
             >
               {isAddingToCart ? (
                 <>
@@ -252,6 +275,8 @@ function Ingredient() {
                   </svg>
                   <span>Adding to Cart...</span>
                 </>
+              ) : !user ? (
+                <span>Please Login to Add to Cart</span>
               ) : (
                 <>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,6 +286,54 @@ function Ingredient() {
                 </>
               )}
             </button>
+
+            {/* 超市购买按钮 */}
+            <div className="mt-4">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">Buy from stores:</h4>
+              <div className="grid grid-cols-2 gap-3">
+                {ingredient.url && ingredient.url["S-market"] && (
+                  <button
+                    onClick={() => handleStoreClick(ingredient.url["S-market"])}
+                    className="bg-gradient-to-br from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 text-slate-700 font-medium py-2.5 px-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 text-sm shadow-sm hover:shadow-md border border-slate-300"
+                  >
+                    <img
+                      src={sKaupatLogo}
+                      alt="S-Kaupat"
+                      className="w-4 h-4 object-contain"
+                    />
+                    <span className="text-xs font-semibold">S-Kaupat</span>
+                  </button>
+                )}
+
+                {ingredient.url && ingredient.url["K-market"] && (
+                  <button
+                    onClick={() => handleStoreClick(ingredient.url["K-market"])}
+                    className="bg-gradient-to-br from-rose-100 to-rose-200 hover:from-rose-200 hover:to-rose-300 text-rose-700 font-medium py-2.5 px-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 text-sm shadow-sm hover:shadow-md border border-rose-300"
+                  >
+                    <img
+                      src={kRuokaLogo}
+                      alt="K-Ruoka"
+                      className="w-4 h-4 object-contain"
+                    />
+                    <span className="text-xs font-semibold">K-Ruoka</span>
+                  </button>
+                )}
+
+                {ingredient.url && ingredient.url["Lidl"] && (
+                  <button
+                    onClick={() => handleStoreClick(ingredient.url["Lidl"])}
+                    className="bg-gradient-to-br from-amber-100 to-amber-200 hover:from-amber-200 hover:to-amber-300 text-amber-700 font-medium py-2.5 px-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 text-sm shadow-sm hover:shadow-md border border-amber-300"
+                  >
+                    <img
+                      src={lidlLogo}
+                      alt="Lidl"
+                      className="w-4 h-4 object-contain"
+                    />
+                    <span className="text-xs font-semibold">Lidl</span>
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

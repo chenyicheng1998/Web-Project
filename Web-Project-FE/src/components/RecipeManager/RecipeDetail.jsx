@@ -15,7 +15,7 @@ function RecipeDetail() {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`http://localhost:5001/api/recipes/${id}`);
+        const response = await fetch(`/api/recipes/${id}`);
 
         if (!response.ok) {
           throw new Error('Recipe not found');
@@ -44,7 +44,7 @@ function RecipeDetail() {
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/ingredients');
+        const response = await fetch('/api/ingredients');
         if (response.ok) {
           const ingredientsData = await response.json();
           setIngredients(ingredientsData);
@@ -64,7 +64,7 @@ function RecipeDetail() {
       if (!token) return;
 
       try {
-        const response = await fetch('http://localhost:5001/api/auth/user', {
+        const response = await fetch('/api/auth/user', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -92,7 +92,7 @@ function RecipeDetail() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5001/api/recipes/${id}/bookmark`, {
+      const response = await fetch(`/api/recipes/${id}/bookmark`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -382,7 +382,7 @@ function RecipeDetail() {
                 key={index}
                 className={`flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200 ${isClickable ? 'cursor-pointer hover:shadow-md hover:border-orange-300 transition-all duration-200' : ''
                   }`}
-                onClick={isClickable ? () => navigate(`/ingredient-detail/${ingredientId}`) : undefined}
+                onClick={isClickable ? () => navigate(`/ingredient/${ingredientId}`) : undefined}
               >
                 <div className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-medium mr-3">
                   {index + 1}

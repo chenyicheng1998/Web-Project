@@ -23,7 +23,7 @@ function RecipeCard({ recipe, bookmarkedIds }) {
     }
 
     try {
-      const response = await fetch(`http://localhost:5001/api/recipes/${recipe._id}/bookmark`, {
+      const response = await fetch(`/api/recipes/${recipe._id}/bookmark`, {
         method: 'PATCH', // 改为 PATCH 方法
         headers: {
           'Content-Type': 'application/json',

@@ -31,8 +31,8 @@ function Recipes() {
 
         // Fetch recipes and filter options in parallel
         const [recipesResponse, filterOptionsResponse] = await Promise.all([
-          fetch('http://localhost:5001/api/recipes'),
-          fetch('http://localhost:5001/api/recipes/filter-options')
+          fetch('/api/recipes'),
+          fetch('/api/recipes/filter-options')
         ]);
 
         if (!recipesResponse.ok || !filterOptionsResponse.ok) {
@@ -67,7 +67,7 @@ function Recipes() {
       if (!token) return;
 
       try {
-        const response = await fetch('http://localhost:5001/api/auth/user', {
+        const response = await fetch('/api/auth/user', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -107,7 +107,7 @@ function Recipes() {
         newFilters.allergens.forEach(allergen => queryParams.append('allergens', allergen));
       }
 
-      const response = await fetch(`http://localhost:5001/api/recipes/filter?${queryParams}`);
+      const response = await fetch(`/api/recipes/filter?${queryParams}`);
 
       if (!response.ok) {
         throw new Error('Failed to filter recipes');

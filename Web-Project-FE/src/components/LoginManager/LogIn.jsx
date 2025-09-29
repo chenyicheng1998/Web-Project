@@ -69,7 +69,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5001/api/auth/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -93,7 +93,7 @@ function Login() {
     try {
       console.log('Verifying Google token...'); // 调试日志
       const res = await fetch(
-        "http://localhost:5001/api/auth/verify-google-token",
+        "/api/auth/verify-google-token",
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -103,7 +103,6 @@ function Login() {
 
       if (res.ok && data.valid) {
         login(data.user, token);
-        localStorage.setItem("authToken", token);
         return true;
       }
       return false;
@@ -115,7 +114,7 @@ function Login() {
 
   const handleGoogleLogin = () => {
     console.log('Redirecting to Google OAuth...'); // 调试日志
-    window.location.href = "http://localhost:5001/api/auth/google";
+    window.location.href = "/api/auth/google";
   };
 
   const handleGoBack = () => {

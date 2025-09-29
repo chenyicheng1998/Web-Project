@@ -12,7 +12,6 @@ const Layout = () => {
 
   const handleLogout = () => {
     logout();
-    localStorage.removeItem('authToken');
     window.location.href = '/login'; // 跳转登录页
   };
   console.log('User object:', user);
@@ -41,6 +40,11 @@ const Layout = () => {
             <li>
               <Link to="/about" className="text-gray-700 hover:text-orange-500 transition duration-200">About</Link>
             </li>
+            {user && (
+              <li>
+                <Link to="/cart" className="text-gray-700 hover:text-orange-500 transition duration-200">Cart</Link>
+              </li>
+            )}
           </ul>
 
           {/* 次要导航链接 */}
