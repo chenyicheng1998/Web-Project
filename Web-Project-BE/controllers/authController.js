@@ -2,6 +2,15 @@ const { validationResult } = require('express-validator');
 const User = require('../models/User');
 const { generateToken } = require('../middleware/auth');
 
+// 公共的用户响应格式化函数
+const formatUserResponse = (user) => ({
+  id: user._id,
+  username: user.username,
+  email: user.email,
+  authMethods: user.authMethods,
+  createdAt: user.createdAt
+});
+
 // 用户注册
 const register = async (req, res) => {
   try {
@@ -16,8 +25,12 @@ const register = async (req, res) => {
 
     const { username, email, password } = req.body;
 
-    // 检查用户名是否已存在
-    const existingUserByUsername = await User.findOne({ username });
+    // 并行检查用户名和邮箱是否已存在（性能优化）
+    const [existingUserByUsername, existingUserByEmail] = await Promise.all([
+      User.findOne({ username }),
+      User.findOne({ email })
+    ]);
+
     if (existingUserByUsername) {
       return res.status(409).json({
         message: 'Username already taken',
@@ -25,13 +38,24 @@ const register = async (req, res) => {
       });
     }
 
-    // 检查邮箱是否已存在
-    const existingUserByEmail = await User.findOne({ email });
-
     if (existingUserByEmail) {
       // 如果邮箱已存在但只有Google认证（没有本地密码），允许添加本地认证
       if (existingUserByEmail.googleId && !existingUserByEmail.password) {
-        // 为现有Google用户添加本地认证
+        // 检查新用户名是否与其他用户冲突（排除当前用户）
+        const usernameConflict = await User.findOne({
+          username,
+          _id: { $ne: existingUserByEmail._id }
+        });
+
+        if (usernameConflict) {
+          return res.status(409).json({
+            message: 'Username already taken',
+            code: 'USERNAME_EXISTS'
+          });
+        }
+
+        // 为现有Google用户添加本地认证，并更新用户名为本地注册时填写的用户名
+        existingUserByEmail.username = username; // 使用本地注册时填写的用户名
         existingUserByEmail.password = password;
         existingUserByEmail.addAuthMethod('local');
         await existingUserByEmail.save();
@@ -39,15 +63,9 @@ const register = async (req, res) => {
         const token = generateToken(existingUserByEmail._id);
 
         return res.status(200).json({
-          message: 'Local authentication added to existing Google account',
+          message: 'Local authentication added to existing Google account with updated username',
           token,
-          user: {
-            id: existingUserByEmail._id,
-            username: existingUserByEmail.username,
-            email: existingUserByEmail.email,
-            authMethods: existingUserByEmail.authMethods,
-            createdAt: existingUserByEmail.createdAt
-          }
+          user: formatUserResponse(existingUserByEmail)
         });
       } else {
         // 邮箱已被其他账户使用（有本地密码或没有Google ID）
@@ -56,7 +74,9 @@ const register = async (req, res) => {
           code: 'EMAIL_EXISTS'
         });
       }
-    }    // 创建新用户
+    }
+
+    // 创建新用户
     const user = new User({
       username,
       email,
@@ -72,13 +92,7 @@ const register = async (req, res) => {
     res.status(201).json({
       message: 'User registered successfully',
       token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        authMethods: user.authMethods,
-        createdAt: user.createdAt
-      }
+      user: formatUserResponse(user)
     });
 
   } catch (error) {
@@ -113,6 +127,14 @@ const login = async (req, res) => {
       });
     }
 
+    // 检查用户是否有本地密码（防止仅Google认证用户尝试密码登录）
+    if (!user.password) {
+      return res.status(401).json({
+        message: 'Please use Google login or register with a password first',
+        code: 'NO_LOCAL_AUTH'
+      });
+    }
+
     // 验证密码
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
@@ -128,12 +150,7 @@ const login = async (req, res) => {
     res.json({
       message: 'Login successful',
       token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        authMethods: user.authMethods
-      }
+      user: formatUserResponse(user)
     });
 
   } catch (error) {
@@ -151,13 +168,16 @@ const getCurrentUser = async (req, res) => {
     // 使用 populate 来获取收藏的食谱信息
     const user = await User.findById(req.user._id).populate('favoriteRecipes');
 
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found',
+        code: 'USER_NOT_FOUND'
+      });
+    }
+
     res.json({
-      id: user._id,
-      username: user.username,
-      email: user.email,
-      authMethods: user.authMethods,
-      createdAt: user.createdAt,
-      favoriteRecipes: user.favoriteRecipes
+      ...formatUserResponse(user),
+      favoriteRecipes: user.favoriteRecipes || []
     });
   } catch (error) {
     console.error('Get current user error:', error);
@@ -174,12 +194,7 @@ const verifyToken = async (req, res) => {
     // 如果到达这里，说明token是有效的（通过了authenticateToken中间件）
     res.json({
       valid: true,
-      user: {
-        id: req.user._id,
-        username: req.user.username,
-        email: req.user.email,
-        authMethods: req.user.authMethods
-      }
+      user: formatUserResponse(req.user)
     });
   } catch (error) {
     console.error('Token verification error:', error);
