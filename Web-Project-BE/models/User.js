@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
   googleId: {
     type: String
   },
-  bookmarkedRecipes: [{
+  favoriteRecipes: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Recipe'
   }],

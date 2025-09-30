@@ -230,7 +230,7 @@ const deleteRecipe = async (req, res) => {
 };
 
 // 切换收藏状态
-const toggleBookmark = async (req, res) => {
+const toggleFavorite = async (req, res) => {
   try {
     const userId = req.user._id;
     const recipeId = req.params.id;
@@ -253,20 +253,20 @@ const toggleBookmark = async (req, res) => {
     }
 
     // 检查是否已收藏 - 使用更精确的ObjectId比较
-    const isBookmarked = user.bookmarkedRecipes.some(bookmarkedId =>
-      bookmarkedId.toString() === recipeId.toString()
+    const isFavorited = user.favoriteRecipes.some(favoriteId =>
+      favoriteId.toString() === recipeId.toString()
     );
     let action;
 
-    if (isBookmarked) {
+    if (isFavorited) {
       // 移除收藏
-      user.bookmarkedRecipes = user.bookmarkedRecipes.filter(
+      user.favoriteRecipes = user.favoriteRecipes.filter(
         id => !id.equals(recipeId)
       );
       action = 'removed';
     } else {
       // 添加收藏
-      user.bookmarkedRecipes.push(recipeId);
+      user.favoriteRecipes.push(recipeId);
       action = 'added';
     }
 
@@ -274,15 +274,45 @@ const toggleBookmark = async (req, res) => {
 
     res.json({
       success: true,
-      message: `Recipe ${action} to bookmarks`,
-      isBookmarked: !isBookmarked,
-      bookmarkedRecipes: user.bookmarkedRecipes
+      message: `Recipe ${action} to favorites`,
+      isFavorited: !isFavorited,
+      favoriteRecipes: user.favoriteRecipes
     });
   } catch (error) {
-    console.error('Toggle bookmark error:', error);
+    console.error('Toggle favorite error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to toggle bookmark',
+      message: 'Failed to toggle favorite',
+      error: error.message
+    });
+  }
+};
+
+// 获取用户收藏的食谱
+const getFavoriteRecipes = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    // 获取用户并填充收藏的食谱
+    const user = await User.findById(userId).populate('favoriteRecipes');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      count: user.favoriteRecipes.length,
+      data: user.favoriteRecipes
+    });
+  } catch (error) {
+    console.error('Get favorite recipes error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch favorite recipes',
       error: error.message
     });
   }
@@ -298,5 +328,6 @@ module.exports = {
   createRecipe,
   updateRecipe,
   deleteRecipe,
-  toggleBookmark,
+  toggleFavorite,
+  getFavoriteRecipes,
 };

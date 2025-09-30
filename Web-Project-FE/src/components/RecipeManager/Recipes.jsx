@@ -20,7 +20,7 @@ function Recipes() {
   const [error, setError] = useState(null);
 
 
-  const [bookmarkedIds, setBookmarkedIds] = useState([]);
+  const [favoriteIds, setFavoriteIds] = useState([]);
 
   // Fetch all recipes and filter options from API
   useEffect(() => {
@@ -62,7 +62,7 @@ function Recipes() {
 
 
   useEffect(() => {
-    const fetchUserBookmarks = async () => {
+    const fetchUserFavorites = async () => {
       const token = localStorage.getItem('authToken');
       if (!token) return;
 
@@ -75,15 +75,15 @@ function Recipes() {
 
         if (response.ok) {
           const userData = await response.json();
-          const ids = userData.bookmarkedRecipes.map(item => item._id?.toString());
-          setBookmarkedIds(ids);
+          const ids = userData.favoriteRecipes.map(item => item._id?.toString());
+          setFavoriteIds(ids);
         }
       } catch (error) {
-        console.error('Failed to fetch user bookmarks:', error);
+        console.error('Failed to fetch user favorites:', error);
       }
     };
 
-    fetchUserBookmarks();
+    fetchUserFavorites();
   }, []);
 
 
@@ -219,7 +219,7 @@ function Recipes() {
       {/* Recipe List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
         {filteredRecipes.map(recipe => (
-          <RecipeCard key={recipe._id} recipe={recipe} bookmarkedIds={bookmarkedIds} />
+          <RecipeCard key={recipe._id} recipe={recipe} favoriteIds={favoriteIds} />
         ))}
       </div>
 

@@ -37,6 +37,11 @@ const Layout = () => {
             <li>
               <Link to="/recipes" className="text-gray-700 hover:text-orange-500 transition duration-200">Recipes</Link>
             </li>
+            {user && (
+              <li>
+                <Link to="/favorites" className="text-gray-700 hover:text-orange-500 transition duration-200">My Favorites</Link>
+              </li>
+            )}
             <li>
               <Link to="/about" className="text-gray-700 hover:text-orange-500 transition duration-200">About</Link>
             </li>

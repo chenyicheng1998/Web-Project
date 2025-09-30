@@ -1,42 +1,42 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-function RecipeCard({ recipe, bookmarkedIds }) {
-  const [isBookmarkedState, setIsBookmarkedState] = useState(false);
+function RecipeCard({ recipe, favoriteIds }) {
+  const [isFavoritedState, setIsFavoritedState] = useState(false);
   // 添加 useEffect 来获取初始收藏状态 - 优化性能
   useEffect(() => {
-    if (bookmarkedIds && recipe._id) {
-      const isBookmarked = bookmarkedIds.includes(recipe._id.toString());
-      setIsBookmarkedState(isBookmarked);
+    if (favoriteIds && recipe._id) {
+      const isFavorited = favoriteIds.includes(recipe._id.toString());
+      setIsFavoritedState(isFavorited);
     }
-  }, [bookmarkedIds, recipe._id]);
+  }, [favoriteIds, recipe._id]);
 
   // 监听全局收藏状态更新事件
   useEffect(() => {
-    const handleBookmarkUpdate = (event) => {
+    const handleFavoriteUpdate = (event) => {
       if (event.detail.recipeId === recipe._id) {
-        setIsBookmarkedState(event.detail.isBookmarked);
+        setIsFavoritedState(event.detail.isFavorited);
       }
     };
 
-    window.addEventListener('bookmarkUpdated', handleBookmarkUpdate);
-    return () => window.removeEventListener('bookmarkUpdated', handleBookmarkUpdate);
+    window.addEventListener('favoriteUpdated', handleFavoriteUpdate);
+    return () => window.removeEventListener('favoriteUpdated', handleFavoriteUpdate);
   }, [recipe._id]);
 
-  // 修改 handleBookmarkToggle 函数
-  const handleBookmarkToggle = async (e) => {
+  // 修改 handleFavoriteToggle 函数
+  const handleFavoriteToggle = async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
     const token = localStorage.getItem('authToken');
 
     if (!token) {
-      alert('Please login to bookmark recipes');
+      alert('Please login to favorite recipes');
       return;
     }
 
     try {
-      const response = await fetch(`/api/recipes/${recipe._id}/bookmark`, {
+      const response = await fetch(`/api/recipes/${recipe._id}/favorite`, {
         method: 'PATCH', // 改为 PATCH 方法
         headers: {
           'Content-Type': 'application/json',
@@ -47,16 +47,16 @@ function RecipeCard({ recipe, bookmarkedIds }) {
       const data = await response.json();
 
       if (data.success) {
-        setIsBookmarkedState(data.isBookmarked);
+        setIsFavoritedState(data.isFavorited);
         // 触发全局收藏状态更新事件
-        window.dispatchEvent(new CustomEvent('bookmarkUpdated', {
-          detail: { recipeId: recipe._id, isBookmarked: data.isBookmarked }
+        window.dispatchEvent(new CustomEvent('favoriteUpdated', {
+          detail: { recipeId: recipe._id, isFavorited: data.isFavorited }
         }));
       } else {
         alert(data.message || 'Operation failed');
       }
     } catch (error) {
-      console.error('Bookmark toggle error:', error);
+      console.error('Favorite toggle error:', error);
       alert('Network error, please try again');
     }
   };
@@ -127,13 +127,13 @@ function RecipeCard({ recipe, bookmarkedIds }) {
             </div>
           )}
 
-          {/* Bookmark Button */}
+          {/* Favorite Button */}
           <button
-            onClick={handleBookmarkToggle}
+            onClick={handleFavoriteToggle}
             className="absolute top-3 right-3 p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all duration-200"
           >
             <svg
-              className={`w-5 h-5 ${isBookmarkedState
+              className={`w-5 h-5 ${isFavoritedState
                 ? 'text-red-500 fill-red-500'
                 : 'text-gray-400 fill-none stroke-current'}`}
               viewBox="0 0 24 24"

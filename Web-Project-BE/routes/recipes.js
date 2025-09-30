@@ -10,7 +10,8 @@ const {
   createRecipe,
   updateRecipe,
   deleteRecipe,
-  toggleBookmark
+  toggleFavorite,
+  getFavoriteRecipes
 } = require('../controllers/recipeController');
 
 const router = express.Router();
@@ -20,6 +21,9 @@ router.get('/', getAllRecipes);
 
 // 获取筛选选项
 router.get('/filter-options', getFilterOptions);
+
+// 获取用户收藏的食谱（需要认证）
+router.get('/favorites', authenticateToken, getFavoriteRecipes);
 
 // 筛选食谱
 router.get('/filter', filterRecipes);
@@ -31,7 +35,7 @@ router.get('/search', searchRecipes);
 router.get('/:id', getRecipeById);
 
 // 切换收藏
-router.patch('/:id/bookmark', authenticateToken, toggleBookmark);
+router.patch('/:id/favorite', authenticateToken, toggleFavorite);
 
 // 创建新食谱（需要认证）
 // router.post('/', authenticateToken, createRecipe);

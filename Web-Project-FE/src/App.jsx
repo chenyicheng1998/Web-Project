@@ -7,6 +7,7 @@ import Login from "./components/LoginManager/LogIn.jsx";
 import Signin from "./components/LoginManager/SignIn.jsx";
 import Recipes from "./components/RecipeManager/Recipes.jsx";
 import RecipeDetail from './components/RecipeManager/RecipeDetail.jsx';
+import FavoriteRecipes from './components/RecipeManager/FavoriteRecipes.jsx';
 import Ingredient from './components/IngredientManager/Ingredient.jsx';
 import About from './components/About.jsx';
 import Cart from './components/CartManager/Cart.jsx';
@@ -21,6 +22,7 @@ function App() {
           <Route path="signin" element={<Signin />} />
           <Route path="recipes" element={<Recipes />} />
           <Route path="recipes/:id" element={<RecipeDetail />} />
+          <Route path="favorites" element={<FavoriteRecipes />} />
           <Route path="ingredient/:id" element={<Ingredient />} />
           <Route path="cart" element={<Cart />} />
           <Route path="about" element={<About />} />

@@ -8,7 +8,7 @@ function RecipeDetail() {
   const [ingredients, setIngredients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
     const fetchRecipeDetail = async () => {
@@ -24,7 +24,7 @@ function RecipeDetail() {
         const responseData = await response.json();
         if (responseData.success) {
           setRecipe(responseData.data);
-          setIsBookmarked(responseData.data.isBookmarked || false);
+          setIsFavorited(responseData.data.isFavorited || false);
         } else {
           throw new Error(responseData.message || 'Failed to fetch recipe');
         }
@@ -59,7 +59,7 @@ function RecipeDetail() {
 
   // 添加获取用户收藏状态的 useEffect
   useEffect(() => {
-    const fetchUserBookmarks = async () => {
+    const fetchUserFavorites = async () => {
       const token = localStorage.getItem('authToken');
       if (!token) return;
 
@@ -72,39 +72,39 @@ function RecipeDetail() {
 
         if (response.ok) {
           const userData = await response.json();
-          const bookmarkedIds = userData.bookmarkedRecipes.map(item => item._id?.toString());
-          setIsBookmarked(bookmarkedIds.includes(id));
+          const favoriteIds = userData.favoriteRecipes.map(item => item._id?.toString());
+          setIsFavorited(favoriteIds.includes(id));
         }
       } catch (error) {
-        console.error('Failed to fetch user bookmarks:', error);
+        console.error('Failed to fetch user favorites:', error);
       }
     };
 
-    fetchUserBookmarks();
+    fetchUserFavorites();
   }, [id]);
 
   // 监听全局收藏状态更新事件
   useEffect(() => {
-    const handleBookmarkUpdate = (event) => {
+    const handleFavoriteUpdate = (event) => {
       if (event.detail.recipeId === id) {
-        setIsBookmarked(event.detail.isBookmarked);
+        setIsFavorited(event.detail.isFavorited);
       }
     };
 
-    window.addEventListener('bookmarkUpdated', handleBookmarkUpdate);
-    return () => window.removeEventListener('bookmarkUpdated', handleBookmarkUpdate);
+    window.addEventListener('favoriteUpdated', handleFavoriteUpdate);
+    return () => window.removeEventListener('favoriteUpdated', handleFavoriteUpdate);
   }, [id]);
 
   // 修改收藏切换处理函数
-  const handleBookmarkToggle = async () => {
+  const handleFavoriteToggle = async () => {
     const token = localStorage.getItem('authToken');
     if (!token) {
-      alert('Please login to bookmark recipes');
+      alert('Please login to favorite recipes');
       return;
     }
 
     try {
-      const response = await fetch(`/api/recipes/${id}/bookmark`, {
+      const response = await fetch(`/api/recipes/${id}/favorite`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -115,16 +115,16 @@ function RecipeDetail() {
       const data = await response.json();
 
       if (data.success) {
-        setIsBookmarked(data.isBookmarked);
+        setIsFavorited(data.isFavorited);
         // 触发全局收藏状态更新事件
-        window.dispatchEvent(new CustomEvent('bookmarkUpdated', {
-          detail: { recipeId: id, isBookmarked: data.isBookmarked }
+        window.dispatchEvent(new CustomEvent('favoriteUpdated', {
+          detail: { recipeId: id, isFavorited: data.isFavorited }
         }));
       } else {
         alert(data.message || 'Operation failed');
       }
     } catch (error) {
-      console.error('Bookmark toggle error:', error);
+      console.error('Favorite toggle error:', error);
       alert('Network error, please try again');
     }
   };
@@ -273,10 +273,10 @@ function RecipeDetail() {
           />
           {/* 书签按钮 */}
           <button
-            onClick={handleBookmarkToggle}
+            onClick={handleFavoriteToggle}
             className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
           >
-            {isBookmarked ? (
+            {isFavorited ? (
               <svg className="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
               </svg>
