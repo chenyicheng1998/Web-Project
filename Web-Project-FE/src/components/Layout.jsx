@@ -14,13 +14,12 @@ const Layout = () => {
     logout();
     window.location.href = '/login'; // 跳转登录页
   };
-  console.log('User object:', user);
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* 顶部导航栏 */}
       <nav className="bg-white shadow-md">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-3 flex items-center">
           {/* Logo和品牌名称 */}
           <div className="flex items-center">
             {/* <img src={logo} alt="Cook Ease Logo" className="h-10 mr-3" /> */}
@@ -29,54 +28,79 @@ const Layout = () => {
             </Link>
           </div>
 
-          {/* 主导航链接 */}
-          <ul className="flex space-x-6">
-            <li>
-              <Link to="/" className="text-gray-700 hover:text-orange-500 transition duration-200">Home</Link>
-            </li>
-            <li>
-              <Link to="/recipes" className="text-gray-700 hover:text-orange-500 transition duration-200">Recipes</Link>
-            </li>
-            {user && (
+          {/* 主导航链接 - 居中显示 */}
+          <div className="flex-1 flex justify-center">
+            <ul className="flex space-x-6">
               <li>
-                <Link to="/favorites" className="text-gray-700 hover:text-orange-500 transition duration-200">My Favorites</Link>
+                <Link to="/" className="text-gray-700 hover:text-orange-500 transition duration-200">Home</Link>
               </li>
-            )}
-            <li>
-              <Link to="/about" className="text-gray-700 hover:text-orange-500 transition duration-200">About</Link>
-            </li>
-            {user && (
               <li>
-                <Link to="/cart" className="text-gray-700 hover:text-orange-500 transition duration-200">Cart</Link>
+                <Link to="/recipes" className="text-gray-700 hover:text-orange-500 transition duration-200">Recipes</Link>
               </li>
-            )}
-          </ul>
+              <li>
+                <Link to="/about" className="text-gray-700 hover:text-orange-500 transition duration-200">About</Link>
+              </li>
+            </ul>
+          </div>
 
-          {/* 次要导航链接 */}
-          <ul className="flex space-x-4">
-            {user ? (
-              <>
-                <li className="flex items-center text-gray-700 px-3 py-2">Hi, {user.username}</li>
+          {/* 右侧导航组 */}
+          <div className="flex items-center space-x-4">
+            {/* 图标导航组 */}
+            {user && (
+              <ul className="flex space-x-4">
                 <li>
-                  <button
-                    onClick={handleLogout}
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition duration-200"
+                  <Link
+                    to="/favorites"
+                    className="text-gray-700 hover:text-orange-500 transition duration-200 flex items-center p-2"
+                    title="My Favorites"
                   >
-                    Logout
-                  </button>
+                    {/* 空心爱心图标 */}
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </Link>
                 </li>
-              </>
-            ) : (
-              <li>
-                <Link
-                  to="/login"
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md transition duration-200"
-                >
-                  Login
-                </Link>
-              </li>
+                <li>
+                  <Link
+                    to="/cart"
+                    className="text-gray-700 hover:text-orange-500 transition duration-200 flex items-center p-2"
+                    title="Shopping Cart"
+                  >
+                    {/* 购物车图标 */}
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0L17 18m-7.5 0a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm7.5 0a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                    </svg>
+                  </Link>
+                </li>
+              </ul>
             )}
-          </ul>
+
+            {/* 用户信息导航 */}
+            <ul className="flex space-x-4">
+              {user ? (
+                <>
+                  <li className="flex items-center text-gray-700 px-3 py-2">Hi, {user.username}</li>
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition duration-200"
+                    >
+                      Logout
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <li>
+                  <Link
+                    to="/login"
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md transition duration-200"
+                  >
+                    Login
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </div>
         </div>
       </nav>
 

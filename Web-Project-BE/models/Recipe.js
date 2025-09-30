@@ -63,7 +63,7 @@ const recipeSchema = new mongoose.Schema({
     min: 0,
     max: 5
   },
-  // isBookmarked: {
+  // isFavorited: {
   //   type: Boolean,
   //   default: false
   // },
@@ -85,17 +85,17 @@ recipeSchema.index({ rating: -1 });
 recipeSchema.index({ title: 'text', description: 'text' }); // 文本搜索索引
 
 // 虚拟字段：获取所有唯一的国家
-recipeSchema.statics.getCountries = function() {
+recipeSchema.statics.getCountries = function () {
   return this.distinct('country');
 };
 
 // 虚拟字段：获取所有唯一的主要成分
-recipeSchema.statics.getMainIngredients = function() {
+recipeSchema.statics.getMainIngredients = function () {
   return this.distinct('mainIngredient');
 };
 
 // 虚拟字段：获取所有唯一的过敏原
-recipeSchema.statics.getAllergens = function() {
+recipeSchema.statics.getAllergens = function () {
   return this.aggregate([
     { $unwind: '$allergens' },
     { $group: { _id: '$allergens' } },
@@ -104,24 +104,24 @@ recipeSchema.statics.getAllergens = function() {
 };
 
 // 过滤食谱的静态方法
-recipeSchema.statics.filterRecipes = function(filters) {
+recipeSchema.statics.filterRecipes = function (filters) {
   const query = {};
-  
+
   // 国家过滤
   if (filters.country && filters.country.length > 0) {
     query.country = { $in: filters.country };
   }
-  
+
   // 主要成分过滤
   if (filters.mainIngredient && filters.mainIngredient.length > 0) {
     query.mainIngredient = { $in: filters.mainIngredient };
   }
-  
+
   // 过敏原过滤（排除包含指定过敏原的食谱）
   if (filters.allergens && filters.allergens.length > 0) {
     query.allergens = { $nin: filters.allergens };
   }
-  
+
   return this.find(query);
 };
 

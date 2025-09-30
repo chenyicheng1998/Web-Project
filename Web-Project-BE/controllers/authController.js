@@ -149,7 +149,7 @@ const login = async (req, res) => {
 const getCurrentUser = async (req, res) => {
   try {
     // 使用 populate 来获取收藏的食谱信息
-    const user = await User.findById(req.user._id).populate('bookmarkedRecipes');
+    const user = await User.findById(req.user._id).populate('favoriteRecipes');
 
     res.json({
       id: user._id,
@@ -157,7 +157,7 @@ const getCurrentUser = async (req, res) => {
       email: user.email,
       authMethods: user.authMethods,
       createdAt: user.createdAt,
-      bookmarkedRecipes: user.bookmarkedRecipes
+      favoriteRecipes: user.favoriteRecipes
     });
   } catch (error) {
     console.error('Get current user error:', error);

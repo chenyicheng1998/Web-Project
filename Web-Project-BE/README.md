@@ -213,7 +213,7 @@ GET /api/images/recipes/pho%20receipe.png
   password: String,       // 加密密码（本地用户必需，Google用户可选）
   authMethods: [String],  // 支持的认证方式：['local', 'google']
   googleId: String,       // Google 用户 ID（可选）
-  bookmarkedRecipes: [ObjectId], // 收藏的食谱
+  favoriteRecipes: [ObjectId], // 收藏的食谱
   createdAt: Date,        // 创建时间
   updatedAt: Date         // 更新时间
 }
