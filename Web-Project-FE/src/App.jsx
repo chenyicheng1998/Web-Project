@@ -8,7 +8,6 @@ import Signin from "./components/LoginManager/SignIn.jsx";
 import Recipes from "./components/RecipeManager/Recipes.jsx";
 import RecipeDetail from './components/RecipeManager/RecipeDetail.jsx';
 import Ingredient from './components/IngredientManager/Ingredient.jsx';
-import FishSauceDetail from './components/IngredientManager/FishSauceDetail.jsx';
 import About from './components/About.jsx';
 import Cart from './components/CartManager/Cart.jsx';
 
@@ -23,7 +22,6 @@ function App() {
           <Route path="recipes" element={<Recipes />} />
           <Route path="recipes/:id" element={<RecipeDetail />} />
           <Route path="ingredient/:id" element={<Ingredient />} />
-          <Route path="fish-sauce" element={<FishSauceDetail />} />
           <Route path="cart" element={<Cart />} />
           <Route path="about" element={<About />} />
           <Route path="*" element={<NotFound />} />

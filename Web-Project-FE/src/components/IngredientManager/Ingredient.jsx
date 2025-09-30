@@ -231,14 +231,11 @@ function Ingredient() {
 
                 <div className="flex items-center space-x-2">
                   <input
-                    type="number"
+                    type="text"
                     value={quantity}
                     onChange={handleQuantityInput}
-                    step="1"
-                    min="1"
-                    className="w-20 px-3 py-2 border border-gray-300 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-20 px-3 py-2 border border-gray-300 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
-                  <span className="text-gray-600">{ingredient.unit}</span>
                 </div>
 
                 <button
@@ -290,7 +287,7 @@ function Ingredient() {
             {/* 超市购买按钮 */}
             <div className="mt-4">
               <h4 className="text-sm font-medium text-gray-700 mb-3">Buy from stores:</h4>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 {ingredient.url && ingredient.url["S-market"] && (
                   <button
                     onClick={() => handleStoreClick(ingredient.url["S-market"])}
@@ -299,7 +296,7 @@ function Ingredient() {
                     <img
                       src={sKaupatLogo}
                       alt="S-Kaupat"
-                      className="w-4 h-4 object-contain"
+                      className="h-6 object-contain"
                     />
                     <span className="text-xs font-semibold">S-Kaupat</span>
                   </button>
@@ -313,7 +310,7 @@ function Ingredient() {
                     <img
                       src={kRuokaLogo}
                       alt="K-Ruoka"
-                      className="w-4 h-4 object-contain"
+                      className="h-6 object-contain"
                     />
                     <span className="text-xs font-semibold">K-Ruoka</span>
                   </button>
@@ -327,7 +324,7 @@ function Ingredient() {
                     <img
                       src={lidlLogo}
                       alt="Lidl"
-                      className="w-4 h-4 object-contain"
+                      className="h-6 object-contain"
                     />
                     <span className="text-xs font-semibold">Lidl</span>
                   </button>
