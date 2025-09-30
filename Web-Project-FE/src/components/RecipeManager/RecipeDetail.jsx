@@ -83,6 +83,18 @@ function RecipeDetail() {
     fetchUserBookmarks();
   }, [id]);
 
+  // 监听全局收藏状态更新事件
+  useEffect(() => {
+    const handleBookmarkUpdate = (event) => {
+      if (event.detail.recipeId === id) {
+        setIsBookmarked(event.detail.isBookmarked);
+      }
+    };
+
+    window.addEventListener('bookmarkUpdated', handleBookmarkUpdate);
+    return () => window.removeEventListener('bookmarkUpdated', handleBookmarkUpdate);
+  }, [id]);
+
   // 修改收藏切换处理函数
   const handleBookmarkToggle = async () => {
     const token = localStorage.getItem('authToken');
@@ -104,6 +116,10 @@ function RecipeDetail() {
 
       if (data.success) {
         setIsBookmarked(data.isBookmarked);
+        // 触发全局收藏状态更新事件
+        window.dispatchEvent(new CustomEvent('bookmarkUpdated', {
+          detail: { recipeId: id, isBookmarked: data.isBookmarked }
+        }));
       } else {
         alert(data.message || 'Operation failed');
       }

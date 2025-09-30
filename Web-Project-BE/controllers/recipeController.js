@@ -252,8 +252,10 @@ const toggleBookmark = async (req, res) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    // 检查是否已收藏
-    const isBookmarked = user.bookmarkedRecipes.includes(recipeId);
+    // 检查是否已收藏 - 使用更精确的ObjectId比较
+    const isBookmarked = user.bookmarkedRecipes.some(bookmarkedId =>
+      bookmarkedId.toString() === recipeId.toString()
+    );
     let action;
 
     if (isBookmarked) {

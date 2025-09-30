@@ -33,7 +33,6 @@ const RecipeFilter = ({ filters, availableOptions, onFilterChange, onClearFilter
   };
 
   const handleRemoveFilter = (filterType, value) => {
-    console.log('Removing filter:', filterType, value);
     const newFilters = { ...filters };
 
     // 修改这里：支持多选的移除
@@ -43,7 +42,6 @@ const RecipeFilter = ({ filters, availableOptions, onFilterChange, onClearFilter
       newFilters[filterType] = '';
     }
 
-    console.log('New filters after removal:', newFilters);
     onFilterChange(newFilters);
   };
 

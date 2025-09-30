@@ -3,11 +3,25 @@ import { Link } from "react-router-dom";
 
 function RecipeCard({ recipe, bookmarkedIds }) {
   const [isBookmarkedState, setIsBookmarkedState] = useState(false);
-  // 添加 useEffect 来获取初始收藏状态
+  // 添加 useEffect 来获取初始收藏状态 - 优化性能
   useEffect(() => {
-    const isBookmarked = bookmarkedIds?.includes(recipe._id?.toString());
-    setIsBookmarkedState(isBookmarked || false);
+    if (bookmarkedIds && recipe._id) {
+      const isBookmarked = bookmarkedIds.includes(recipe._id.toString());
+      setIsBookmarkedState(isBookmarked);
+    }
   }, [bookmarkedIds, recipe._id]);
+
+  // 监听全局收藏状态更新事件
+  useEffect(() => {
+    const handleBookmarkUpdate = (event) => {
+      if (event.detail.recipeId === recipe._id) {
+        setIsBookmarkedState(event.detail.isBookmarked);
+      }
+    };
+
+    window.addEventListener('bookmarkUpdated', handleBookmarkUpdate);
+    return () => window.removeEventListener('bookmarkUpdated', handleBookmarkUpdate);
+  }, [recipe._id]);
 
   // 修改 handleBookmarkToggle 函数
   const handleBookmarkToggle = async (e) => {
@@ -15,7 +29,6 @@ function RecipeCard({ recipe, bookmarkedIds }) {
     e.stopPropagation();
 
     const token = localStorage.getItem('authToken');
-    console.log('Token from localStorage:', token); // 添加这行
 
     if (!token) {
       alert('Please login to bookmark recipes');
@@ -35,6 +48,10 @@ function RecipeCard({ recipe, bookmarkedIds }) {
 
       if (data.success) {
         setIsBookmarkedState(data.isBookmarked);
+        // 触发全局收藏状态更新事件
+        window.dispatchEvent(new CustomEvent('bookmarkUpdated', {
+          detail: { recipeId: recipe._id, isBookmarked: data.isBookmarked }
+        }));
       } else {
         alert(data.message || 'Operation failed');
       }
