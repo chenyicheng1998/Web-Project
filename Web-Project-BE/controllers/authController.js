@@ -205,10 +205,74 @@ const verifyToken = async (req, res) => {
   }
 };
 
+// 更新用户资料
+const updateProfile = async (req, res) => {
+  try {
+    // 检查验证错误
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const { username, password } = req.body;
+    const userId = req.user._id;
+
+    // 检查用户名是否被其他用户占用
+    if (username) {
+      const existingUser = await User.findOne({
+        username,
+        _id: { $ne: userId }
+      });
+
+      if (existingUser) {
+        return res.status(409).json({
+          message: 'Username already taken',
+          code: 'USERNAME_EXISTS'
+        });
+      }
+    }
+
+    // 准备更新数据
+    const updateData = {};
+    if (username) updateData.username = username;
+    if (password) updateData.password = password;
+
+    // 更新用户信息
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        message: 'User not found',
+        code: 'USER_NOT_FOUND'
+      });
+    }
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: formatUserResponse(updatedUser)
+    });
+
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   getCurrentUser,
-  verifyToken
+  verifyToken,
+  updateProfile
 };
 

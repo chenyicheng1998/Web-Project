@@ -2,7 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 const passport = require('passport');
 const { authenticateToken } = require('../middleware/auth');
-const { register, login, getCurrentUser, verifyToken } = require('../controllers/authController');
+const { register, login, getCurrentUser, verifyToken, updateProfile } = require('../controllers/authController');
 const { googleCallback, verifyGoogleToken } = require('../controllers/googleAuthController');
 
 const router = express.Router();
@@ -60,5 +60,20 @@ router.get('/verify-token', authenticateToken, verifyToken);
 
 // 用户信息路由
 router.get('/user', authenticateToken, getCurrentUser);
+
+// 更新用户资料路由
+router.put('/update-profile', [
+  body('username')
+    .optional()
+    .trim()
+    .isLength({ min: 3, max: 30 })
+    .withMessage('Username must be between 3 and 30 characters')
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage('Username can only contain letters, numbers, and underscores'),
+  body('password')
+    .optional()
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long')
+], authenticateToken, updateProfile);
 
 module.exports = router;

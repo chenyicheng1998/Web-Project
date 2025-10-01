@@ -75,8 +75,14 @@ export const UserProvider = ({ children }) => {
     setUser(null);
   };
 
+  // 更新用户信息函数
+  const updateUser = (userData) => {
+    localStorage.setItem('userInfo', JSON.stringify(userData));
+    setUser(userData);
+  };
+
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider value={{ user, login, logout, updateUser }}>
       {children}
     </UserContext.Provider>
   );

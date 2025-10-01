@@ -79,7 +79,14 @@ const Layout = () => {
             <ul className="flex space-x-4">
               {user ? (
                 <>
-                  <li className="flex items-center text-gray-700 px-3 py-2">Hi, {user.username}</li>
+                  <li>
+                    <Link
+                      to="/settings"
+                      className="text-gray-700 hover:text-orange-500 transition duration-200 px-3 py-2 font-medium flex items-center"
+                    >
+                      Hi, {user.username}
+                    </Link>
+                  </li>
                   <li>
                     <button
                       onClick={handleLogout}

@@ -11,6 +11,7 @@ import FavoriteRecipes from './components/RecipeManager/FavoriteRecipes.jsx';
 import Ingredient from './components/IngredientManager/Ingredient.jsx';
 import About from './components/About.jsx';
 import Cart from './components/CartManager/Cart.jsx';
+import UserSettings from './components/UserSettings/UserSettings.jsx';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="ingredient/:id" element={<Ingredient />} />
           <Route path="cart" element={<Cart />} />
           <Route path="about" element={<About />} />
+          <Route path="settings" element={<UserSettings />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
