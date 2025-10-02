@@ -211,12 +211,14 @@ const updateProfile = async (req, res) => {
     // 检查验证错误
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      // console.log('Validation errors:', errors.array()); // 添加日志
       return res.status(400).json({
         message: 'Validation failed',
         errors: errors.array()
       });
     }
 
+    // console.log('Update profile request:', req.body); // 添加请求日志
     const { username, password } = req.body;
     const userId = req.user._id;
 
@@ -235,24 +237,25 @@ const updateProfile = async (req, res) => {
       }
     }
 
-    // 准备更新数据
-    const updateData = {};
-    if (username) updateData.username = username;
-    if (password) updateData.password = password;
-
-    // 更新用户信息
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      updateData,
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedUser) {
+    // 查找用户
+    const user = await User.findById(userId);
+    if (!user) {
       return res.status(404).json({
         message: 'User not found',
         code: 'USER_NOT_FOUND'
       });
     }
+
+    // 更新用户信息
+    if (username) user.username = username;
+    if (password) {
+      user.password = password; // 这会触发 pre('save') 中间件来加密密码
+      // 如果用户设置了密码，添加本地认证方法
+      user.addAuthMethod('local');
+    }
+
+    // 保存用户（会触发密码加密）
+    const updatedUser = await user.save();
 
     res.json({
       message: 'Profile updated successfully',

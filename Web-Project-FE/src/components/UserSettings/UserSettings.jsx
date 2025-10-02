@@ -22,6 +22,25 @@ const UserSettings = () => {
     e.preventDefault();
     setLoading(true);
 
+    // 基本的前端验证
+    if (!formData.username.trim()) {
+      alert('Username is required');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.username.trim().length < 3) {
+      alert('Username must be at least 3 characters long');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password && formData.password.length < 6) {
+      alert('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('authToken');
       const updateData = {

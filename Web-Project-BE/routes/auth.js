@@ -67,9 +67,8 @@ router.put('/update-profile', [
     .optional()
     .trim()
     .isLength({ min: 3, max: 30 })
-    .withMessage('Username must be between 3 and 30 characters')
-    .matches(/^[a-zA-Z0-9_]+$/)
-    .withMessage('Username can only contain letters, numbers, and underscores'),
+    .withMessage('Username must be between 3 and 30 characters'),
+  // 移除了严格的字符限制，允许更多字符
   body('password')
     .optional()
     .isLength({ min: 6 })
