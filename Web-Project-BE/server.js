@@ -12,6 +12,7 @@ const authRoutes = require('./routes/auth');
 const recipeRoutes = require('./routes/recipes');
 const ingredientRoutes = require('./routes/ingredients');
 const cartRoutes = require('./routes/cart');
+const aiRoutes = require('./routes/ai');
 require('./config/passport'); // Load passport config
 
 // Load environment variables
@@ -79,6 +80,7 @@ app.use('/api/auth', authLimiter, authRoutes); // Authentication routes
 app.use('/api/recipes', recipeRoutes); // Recipe routes
 app.use('/api/ingredients', ingredientRoutes); // Ingredient routes
 app.use('/api/cart', cartRoutes); // Cart routes
+app.use('/api/ai', aiRoutes); // AI recommendation routes
 
 // 404 Handling
 app.use('*', (req, res) => {
