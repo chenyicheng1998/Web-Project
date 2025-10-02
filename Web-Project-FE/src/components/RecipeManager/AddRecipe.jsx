@@ -91,9 +91,9 @@ const AddRecipe = () => {
         return;
       }
 
-      // 检查文件大小 (2MB 限制，因为 base64 会增加约33%大小)
-      if (file.size > 2 * 1024 * 1024) {
-        alert('Image size should be less than 2MB');
+      // 检查文件大小 (10MB 限制，因为 base64 会增加约33%大小)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Image size should be less than 10MB');
         return;
       }
 
@@ -176,45 +176,80 @@ const AddRecipe = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* 基本信息 */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-gray-800">Basic Information</h3>
+        {/* 图片上传 - 第一个 */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Recipe Image</h3>
+          <div>
+            <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
+              Upload Recipe Image *
+            </label>
+            <input
+              type="file"
+              id="image"
+              accept="image/*"
+              onChange={handleImageUpload}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            />
+            {formData.image && (
+              <div className="mt-2">
+                <img
+                  src={formData.image}
+                  alt="Recipe preview"
+                  className="w-32 h-32 object-cover rounded-md border border-gray-300"
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  {formData.imageFile ? formData.imageFile.name : 'Image uploaded'}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
 
-            {/* 标题 */}
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                Recipe Title *
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="Enter recipe title"
-              />
-            </div>
+        {/* 描述 - 第二个 */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Description</h3>
+          <div>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+              Recipe Description *
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              required
+              rows={4}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              placeholder="Describe your recipe in detail..."
+            />
+          </div>
+        </div>
 
-            {/* 描述 */}
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                Description *
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                required
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="Describe your recipe"
-              />
-            </div>
+        {/* 标题 - 第三个 */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Recipe Title</h3>
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+              Recipe Title *
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              placeholder="Enter a catchy recipe title"
+            />
+          </div>
+        </div>
 
+        {/* 基本信息 */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Basic Information</h3>
+          <div className="grid md:grid-cols-2 gap-4">
             {/* 国家 */}
             <div>
               <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
@@ -249,7 +284,7 @@ const AddRecipe = () => {
               />
             </div>
 
-            {/* 烹饲时间 */}
+            {/* 烹饪时间 */}
             <div>
               <label htmlFor="cookTime" className="block text-sm font-medium text-gray-700 mb-1">
                 Cook Time *
@@ -287,167 +322,146 @@ const AddRecipe = () => {
               </select>
             </div>
           </div>
+        </div>
 
-          {/* 图片和过敏原 */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-gray-800">Image & Allergens</h3>
-
-            {/* 图片上传 */}
-            <div>
-              <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
-                Recipe Image
+        {/* 过敏原 */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Allergens</h3>
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {commonAllergens.map(allergen => (
+              <label key={allergen} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={formData.allergens.includes(allergen)}
+                  onChange={() => handleAllergenChange(allergen)}
+                  className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                />
+                <span className="text-sm text-gray-700">{allergen}</span>
               </label>
-              <input
-                type="file"
-                id="image"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              />
-              {formData.image && (
-                <div className="mt-2">
-                  <img
-                    src={formData.image}
-                    alt="Recipe preview"
-                    className="w-32 h-32 object-cover rounded-md border border-gray-300"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    {formData.imageFile ? formData.imageFile.name : 'Image uploaded'}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* 过敏原 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Allergens
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {commonAllergens.map(allergen => (
-                  <label key={allergen} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={formData.allergens.includes(allergen)}
-                      onChange={() => handleAllergenChange(allergen)}
-                      className="mr-2"
-                    />
-                    <span className="text-sm">{allergen}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
         {/* 食材列表 */}
         <div>
           <h3 className="text-xl font-semibold text-gray-800 mb-4">Ingredients</h3>
-          {formData.ingredients.map((ingredient, index) => (
-            <div key={index} className="flex space-x-2 mb-2">
-              <input
-                type="text"
-                placeholder="Ingredient name"
-                value={ingredient.name}
-                onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              />
-              <input
-                type="text"
-                placeholder="Quantity"
-                value={ingredient.quantity}
-                onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
-                className="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              />
-              {formData.ingredients.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeIngredient(index)}
-                  className="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-                >
-                  Remove
-                </button>
-              )}
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={addIngredient}
-            className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-          >
-            Add Ingredient
-          </button>
+          <div className="space-y-3">
+            {formData.ingredients.map((ingredient, index) => (
+              <div key={index} className="flex space-x-3">
+                <input
+                  type="text"
+                  placeholder="Ingredient name"
+                  value={ingredient.name}
+                  onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                />
+                <input
+                  type="text"
+                  placeholder="Quantity"
+                  value={ingredient.quantity}
+                  onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
+                  className="w-40 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                />
+                {formData.ingredients.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeIngredient(index)}
+                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addIngredient}
+              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200"
+            >
+              + Add Ingredient
+            </button>
+          </div>
         </div>
 
-        {/* 烹饲步骤 */}
+        {/* 烹饪步骤 */}
         <div>
-          <label htmlFor="instructions" className="block text-sm font-medium text-gray-700 mb-1">
-            Cooking Instructions *
-          </label>
-          <textarea
-            id="instructions"
-            name="instructions"
-            value={formData.instructions}
-            onChange={handleChange}
-            required
-            rows={6}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            placeholder="Describe the cooking steps in detail..."
-          />
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Cooking Instructions</h3>
+          <div>
+            <label htmlFor="instructions" className="block text-sm font-medium text-gray-700 mb-1">
+              Step-by-step Instructions *
+            </label>
+            <textarea
+              id="instructions"
+              name="instructions"
+              value={formData.instructions}
+              onChange={handleChange}
+              required
+              rows={8}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              placeholder="Describe the cooking steps in detail... 
+1. First step...
+2. Second step...
+3. Third step..."
+            />
+          </div>
         </div>
 
         {/* 营养信息 */}
         <div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Nutrition Information (Optional)</h3>
-          <div className="grid md:grid-cols-4 gap-4">
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Nutrition Information</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <label htmlFor="nutrition.Calories" className="block text-sm font-medium text-gray-700 mb-1">
-                Calories
+                Calories *
               </label>
               <input
                 type="text"
                 name="nutrition.Calories"
                 value={formData.nutrition.Calories}
                 onChange={handleChange}
+                required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 placeholder="e.g., 350 kcal"
               />
             </div>
             <div>
               <label htmlFor="nutrition.Protein" className="block text-sm font-medium text-gray-700 mb-1">
-                Protein
+                Protein *
               </label>
               <input
                 type="text"
                 name="nutrition.Protein"
                 value={formData.nutrition.Protein}
                 onChange={handleChange}
+                required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 placeholder="e.g., 25g"
               />
             </div>
             <div>
               <label htmlFor="nutrition.Carbohydrates" className="block text-sm font-medium text-gray-700 mb-1">
-                Carbohydrates
+                Carbohydrates *
               </label>
               <input
                 type="text"
                 name="nutrition.Carbohydrates"
                 value={formData.nutrition.Carbohydrates}
                 onChange={handleChange}
+                required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 placeholder="e.g., 45g"
               />
             </div>
             <div>
               <label htmlFor="nutrition.Fat" className="block text-sm font-medium text-gray-700 mb-1">
-                Fat
+                Fat *
               </label>
               <input
                 type="text"
                 name="nutrition.Fat"
                 value={formData.nutrition.Fat}
                 onChange={handleChange}
+                required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 placeholder="e.g., 12g"
               />
@@ -456,18 +470,28 @@ const AddRecipe = () => {
         </div>
 
         {/* 提交按钮 */}
-        <div className="flex space-x-4 pt-6">
+        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-6 border-t border-gray-200">
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-md font-medium transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-4 px-6 rounded-lg font-semibold text-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
           >
-            {loading ? 'Creating Recipe...' : 'Create Recipe'}
+            {loading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Creating Recipe...
+              </span>
+            ) : (
+              'Create Recipe'
+            )}
           </button>
           <button
             type="button"
             onClick={() => navigate('/recipes')}
-            className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 px-6 rounded-md font-medium transition duration-200"
+            className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-4 px-6 rounded-lg font-semibold text-lg transition duration-200 shadow-lg hover:shadow-xl"
           >
             Cancel
           </button>

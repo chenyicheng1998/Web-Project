@@ -28,8 +28,8 @@ app.use(cors({
   origin: process.env.FRONTEND_URL, // Allow only frontend origin
   credentials: true, // Allow cookies to be sent
 }));
-app.use(express.json({ limit: '10mb' })); // Body parser for JSON with increased limit for image uploads
-app.use(express.urlencoded({ limit: '10mb', extended: true })); // Handle form data with increased limit
+app.use(express.json({ limit: '15mb' })); // Body parser for JSON with increased limit for image uploads (10MB image -> ~13.3MB base64)
+app.use(express.urlencoded({ limit: '15mb', extended: true })); // Handle form data with increased limit
 
 // Session middleware for Passport
 app.use(session({
