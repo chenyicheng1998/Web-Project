@@ -1,4 +1,6 @@
 const Recipe = require('../models/Recipe');
+const fs = require('fs');
+const path = require('path');
 const User = require('../models/User'); // 添加这行导入
 const mongoose = require('mongoose'); // 添加这行
 
@@ -154,7 +156,44 @@ const searchRecipes = async (req, res) => {
 // 创建新食谱
 const createRecipe = async (req, res) => {
   try {
-    const recipe = new Recipe(req.body);
+    const recipeData = req.body;
+
+    // 处理图片上传
+    if (recipeData.image && recipeData.imageFileName) {
+      try {
+        // 确保 recipes 目录存在
+        const recipesDir = path.join(__dirname, '../public/images/recipes');
+        if (!fs.existsSync(recipesDir)) {
+          fs.mkdirSync(recipesDir, { recursive: true });
+        }
+
+        // 提取 base64 数据
+        const base64Data = recipeData.image.replace(/^data:image\/[a-z]+;base64,/, '');
+
+        // 生成唯一文件名
+        const timestamp = Date.now();
+        const fileExtension = path.extname(recipeData.imageFileName) || '.jpg';
+        const fileName = `recipe_${timestamp}${fileExtension}`;
+        const filePath = path.join(recipesDir, fileName);
+
+        // 保存图片文件
+        fs.writeFileSync(filePath, base64Data, 'base64');
+
+        // 更新图片路径为API路径
+        recipeData.image = `/api/images/recipes/${fileName}`;
+
+        console.log(`Image saved: ${fileName}`);
+      } catch (imageError) {
+        console.error('Image upload error:', imageError);
+        // 如果图片上传失败，使用默认图片
+        recipeData.image = '/api/images/recipes/default-recipe.jpg';
+      }
+    }
+
+    // 移除临时字段
+    delete recipeData.imageFileName;
+
+    const recipe = new Recipe(recipeData);
     await recipe.save();
 
     res.status(201).json({

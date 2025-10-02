@@ -38,7 +38,7 @@ router.get('/:id', getRecipeById);
 router.patch('/:id/favorite', authenticateToken, toggleFavorite);
 
 // 创建新食谱（需要认证）
-// router.post('/', authenticateToken, createRecipe);
+router.post('/', authenticateToken, createRecipe);
 
 // 更新食谱（需要认证）
 // router.put('/:id', authenticateToken, updateRecipe);

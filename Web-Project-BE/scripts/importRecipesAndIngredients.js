@@ -11,7 +11,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 const Recipe = require('../models/Recipe');
 const Ingredient = require('../models/Ingredient');
 
-// 食材数据 - 使用UUID确保全局唯一性 (Pho专用食材)
+// 食材数据 - 使用UUID确保全局唯一性 (多种料理的食材)
 const ingredientsData = [
   {
     id: uuidv4(),
@@ -471,23 +471,39 @@ async function importData() {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
 
+    // 验证数据的完整性
+    console.log('Validating data...');
+    const missingIds = recipesData.some(recipe =>
+      recipe.ingredients.some(ing =>
+        ing.id && !ingredientsData.find(ingredient => ingredient.id === ing.id) &&
+        !ing.id.includes('-') // 检查是否是新的UUID（不在ingredientsData中）
+      )
+    );
+
+    if (missingIds) {
+      console.warn('Warning: Some recipe ingredients reference IDs not found in ingredientsData');
+    }
+
     // 清空现有数据（可选）
+    console.log('Clearing existing data...');
     await Ingredient.deleteMany({});
     await Recipe.deleteMany({});
     console.log('Cleared existing data');
 
     // 先插入食材
+    console.log('Importing ingredients...');
     const ingredients = await Ingredient.insertMany(ingredientsData);
-    console.log(`Successfully imported ${ingredients.length} ingredients`);
+    console.log(`✓ Successfully imported ${ingredients.length} ingredients`);
 
     // 插入食谱
+    console.log('Importing recipes...');
     const recipes = await Recipe.insertMany(recipesData);
-    console.log(`Successfully imported ${recipes.length} recipes`);
+    console.log(`✓ Successfully imported ${recipes.length} recipes`);
 
     // 显示导入的食谱标题
-    console.log('\nImported recipes:');
+    console.log('\n🍲 Imported recipes:');
     recipes.forEach((recipe, index) => {
-      console.log(`${index + 1}. ${recipe.title} (${recipe.country})`);
+      console.log(`  ${index + 1}. ${recipe.title} (${recipe.country})`);
     });
 
     // 验证数据
