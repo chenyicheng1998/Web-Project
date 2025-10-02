@@ -44,6 +44,6 @@ router.post('/', authenticateToken, createRecipe);
 // router.put('/:id', authenticateToken, updateRecipe);
 
 // 删除食谱（需要认证）
-// router.delete('/:id', authenticateToken, deleteRecipe);
+router.delete('/:id', authenticateToken, deleteRecipe);
 
 module.exports = router;

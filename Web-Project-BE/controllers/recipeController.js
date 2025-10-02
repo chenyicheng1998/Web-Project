@@ -245,7 +245,7 @@ const updateRecipe = async (req, res) => {
 // 删除食谱
 const deleteRecipe = async (req, res) => {
   try {
-    const recipe = await Recipe.findByIdAndDelete(req.params.id);
+    const recipe = await Recipe.findById(req.params.id);
 
     if (!recipe) {
       return res.status(404).json({
@@ -253,6 +253,27 @@ const deleteRecipe = async (req, res) => {
         message: 'Recipe not found'
       });
     }
+
+    // 删除关联的图片文件
+    if (recipe.image && recipe.image.startsWith('/api/images/recipes/')) {
+      try {
+        // 提取文件名
+        const fileName = path.basename(recipe.image);
+        const filePath = path.join(__dirname, '../public/images/recipes', fileName);
+
+        // 检查文件是否存在并删除
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`Image file deleted: ${fileName}`);
+        }
+      } catch (fileError) {
+        console.error('Error deleting image file:', fileError);
+        // 即使图片删除失败，也继续删除数据库记录
+      }
+    }
+
+    // 删除数据库记录
+    await Recipe.findByIdAndDelete(req.params.id);
 
     res.json({
       success: true,
