@@ -31,6 +31,7 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '15mb' })); // Body parser for JSON with increased limit for image uploads (10MB image -> ~13.3MB base64)
 app.use(express.urlencoded({ limit: '15mb', extended: true })); // Handle form data with increased limit
+app.use(express.static('view')); // Serve static files from 'view'
 
 // Session middleware for Passport
 app.use(session({
@@ -81,6 +82,10 @@ app.use('/api/recipes', recipeRoutes); // Recipe routes
 app.use('/api/ingredients', ingredientRoutes); // Ingredient routes
 app.use('/api/cart', cartRoutes); // Cart routes
 app.use('/api/ai', aiRoutes); // AI recommendation routes
+
+app.use((req, res) => {
+  res.sendFile(__dirname + '/view/index.html');
+});
 
 // 404 Handling
 app.use('*', (req, res) => {
