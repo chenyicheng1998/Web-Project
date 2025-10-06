@@ -34,6 +34,9 @@ router.get('/search', searchRecipes);
 // 根据ID获取单个食谱
 router.get('/:id', getRecipeById);
 
+//update receipe
+router.put('/:id', updateRecipe);
+
 // 切换收藏
 router.patch('/:id/favorite', authenticateToken, toggleFavorite);
 

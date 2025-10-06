@@ -13,6 +13,7 @@ import Ingredient from './components/IngredientManager/Ingredient.jsx';
 import About from './components/About.jsx';
 import Cart from './components/CartManager/Cart.jsx';
 import UserSettings from './components/UserSettings/UserSettings.jsx';
+import EditRecipe from "./components/RecipeManager/EditReceipe.jsx";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="recipes" element={<Recipes />} />
           <Route path="recipes/:id" element={<RecipeDetail />} />
           <Route path="add-recipe" element={<AddRecipe />} />
+          <Route path="/recipes/edit/:id" element={<EditRecipe />} />
           <Route path="favorites" element={<FavoriteRecipes />} />
           <Route path="ingredient/:id" element={<Ingredient />} />
           <Route path="cart" element={<Cart />} />
