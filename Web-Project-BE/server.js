@@ -23,6 +23,9 @@ connectDB();
 
 const app = express();
 
+// Trust proxy for Render deployment (handles X-Forwarded-For headers)
+app.set('trust proxy', 1);
+
 // Security Middleware
 app.use(helmet());
 app.use(cors({
@@ -62,6 +65,7 @@ const authLimiter = rateLimit({
   message: 'Too many requests from this IP, please try again after 15 minutes',
   standardHeaders: true, // Return rate limit info in the headers
   legacyHeaders: false, // Disable X-RateLimit-* headers
+  trustProxy: true, // Trust proxy headers (for Render deployment)
 });
 
 // Health check endpoint
