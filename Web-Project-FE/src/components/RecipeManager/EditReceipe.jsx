@@ -77,9 +77,21 @@ const EditRecipe = () => {
     try {
       const token = localStorage.getItem("authToken");
 
-      // Remove imageFile before sending
-      const submitData = { ...formData };
+      // Ensure ingredients exist and each has an ID
+      const ingredientsWithId = (formData.ingredients || []).map((ing, index) => ({
+        ...ing,
+        id: ing.id || `custom-${Date.now()}-${index}`,
+      }));
+
+      // Prepare submit data
+      const submitData = {
+        ...formData,
+        ingredients: ingredientsWithId,
+        imageFileName: formData.imageFile ? formData.imageFile.name : null
+      };
       delete submitData.imageFile;
+
+      console.log("Submitting:", JSON.stringify(submitData, null, 2)); // for debugging
 
       const res = await fetch(`/api/recipes/${id}`, {
         method: "PUT",
@@ -96,11 +108,13 @@ const EditRecipe = () => {
       alert("Recipe updated successfully!");
       navigate(`/recipes/${id}`);
     } catch (err) {
+      console.error(err);
       alert(err.message);
     } finally {
       setSaving(false);
     }
   };
+
 
   if (loading) return <p className="text-center py-10">Loading recipe...</p>;
   if (!formData)
@@ -193,6 +207,70 @@ const EditRecipe = () => {
             className="w-full border rounded-md px-3 py-2"
           />
         </div>
+
+        {/* Ingredients */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Ingredients</h3>
+          <div className="space-y-3">
+            {formData.ingredients.map((ingredient, index) => (
+              <div key={index} className="flex space-x-3">
+                <input
+                  type="text"
+                  placeholder="Ingredient name"
+                  value={ingredient.name || ""}
+                  onChange={(e) => {
+                    const updatedIngredients = [...formData.ingredients];
+                    updatedIngredients[index].name = e.target.value;
+                    setFormData({ ...formData, ingredients: updatedIngredients });
+                  }}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                />
+                <input
+                  type="text"
+                  placeholder="Quantity"
+                  value={ingredient.quantity || ""}
+                  onChange={(e) => {
+                    const updatedIngredients = [...formData.ingredients];
+                    updatedIngredients[index].quantity = e.target.value;
+                    setFormData({ ...formData, ingredients: updatedIngredients });
+                  }}
+                  className="w-40 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                />
+                {formData.ingredients.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updatedIngredients = formData.ingredients.filter(
+                        (_, i) => i !== index
+                      );
+                      setFormData({ ...formData, ingredients: updatedIngredients });
+                    }}
+                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                setFormData({
+                  ...formData,
+                  ingredients: [
+                    ...(formData.ingredients || []),
+                    { name: "", quantity: "" },
+                  ],
+                })
+              }
+              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200"
+            >
+              + Add Ingredient
+            </button>
+
+          </div>
+        </div>
+
 
         {/* Instructions */}
         <div>
