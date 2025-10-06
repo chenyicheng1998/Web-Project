@@ -114,7 +114,15 @@ function Login() {
 
   const handleGoogleLogin = () => {
     console.log('Redirecting to Google OAuth...'); // 调试日志
-    window.location.href = "/api/auth/google";
+    // 根据环境使用不同的后端URL
+    const backendUrl = import.meta.env.VITE_API_URL;
+    if (backendUrl) {
+      // 开发环境，使用完整URL
+      window.location.href = `${backendUrl}/api/auth/google`;
+    } else {
+      // 生产环境，使用相对路径（前后端在同一域名）
+      window.location.href = "/api/auth/google";
+    }
   };
 
   const handleGoBack = () => {

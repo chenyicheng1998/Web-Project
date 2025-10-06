@@ -27,7 +27,7 @@ passport.use(new JwtStrategy({
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "/api/auth/google/callback"
+  callbackURL: process.env.GOOGLE_CALLBACK_URL || "/api/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     // 这里不需要查找或创建用户，我们会在回调控制器中处理
@@ -53,13 +53,13 @@ passport.deserializeUser(async (id, done) => {
         return done(null, user);
       }
     }
-    
+
     // 如果不是ObjectId或找不到用户，尝试作为Google ID查找
     const user = await User.findOne({ googleId: id }).select('-password');
     if (user) {
       return done(null, user);
     }
-    
+
     // 都找不到，返回null
     done(null, null);
   } catch (error) {
