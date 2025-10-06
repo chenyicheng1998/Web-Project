@@ -76,6 +76,9 @@ app.get('/health', (req, res) => {
 // Static file serving for images
 app.use('/api/images', express.static(path.join(__dirname, 'public/images')));
 
+// Static file serving for Google verification and other files
+app.use(express.static(path.join(__dirname, 'public')));
+
 // API Routes
 app.use('/api/auth', authLimiter, authRoutes); // Authentication routes
 app.use('/api/recipes', recipeRoutes); // Recipe routes
