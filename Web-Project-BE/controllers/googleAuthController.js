@@ -4,12 +4,18 @@ const { generateToken } = require('../middleware/auth');
 // Google OAuth 成功回调处理
 const googleCallback = async (req, res) => {
   try {
+    console.log('Google callback triggered'); // 调试日志
+    console.log('User from Google:', req.user); // 调试日志
+    console.log('Frontend URL:', process.env.FRONTEND_URL); // 调试日志
+
     if (!req.user) {
+      console.log('No user found in request'); // 调试日志
       return res.redirect(`${process.env.FRONTEND_URL}/#/login?error=google_auth_failed`);
     }
 
     const { id, displayName, emails, photos } = req.user;
     const email = emails[0].value;
+    console.log('Processing Google user:', email); // 调试日志
 
     // 首先查找是否已有相同邮箱的用户
     let user = await User.findOne({ email });
@@ -32,20 +38,37 @@ const googleCallback = async (req, res) => {
         console.log('将Google认证合并到现有账户:', user.email);
       } else if (user.googleId !== id) {
         // 邮箱已经被其他Google账户使用
-        return res.redirect(`${process.env.FRONTEND_URL}/#/login?error=email_already_linked_to_different_google_account`);
+        console.log('Email already linked to different Google account'); // 调试日志
+        const frontendUrl = process.env.FRONTEND_URL || '';
+        const redirectUrl = frontendUrl ?
+          `${frontendUrl}/#/login?error=email_already_linked_to_different_google_account` :
+          `/#/login?error=email_already_linked_to_different_google_account`;
+        return res.redirect(redirectUrl);
       }
       // 如果 googleId 相同，则是同一个用户，无需操作
     }
 
     // 生成JWT token
     const token = generateToken(user._id);
+    console.log('Generated token for user:', user.email); // 调试日志
 
     // 重定向到前端，携带token
-    res.redirect(`${process.env.FRONTEND_URL}/#/login?token=${token}&success=google_login`);
+    // 由于前端和后端在同一域名，使用相对路径
+    const frontendUrl = process.env.FRONTEND_URL || '';
+    const redirectUrl = frontendUrl ?
+      `${frontendUrl}/#/login?token=${token}&success=google_login` :
+      `/#/login?token=${token}&success=google_login`;
+
+    console.log('Redirecting to:', redirectUrl); // 调试日志
+    res.redirect(redirectUrl);
 
   } catch (error) {
     console.error('Google callback error:', error);
-    res.redirect(`${process.env.FRONTEND_URL}/#/login?error=google_auth_failed`);
+    const frontendUrl = process.env.FRONTEND_URL || '';
+    const redirectUrl = frontendUrl ?
+      `${frontendUrl}/#/login?error=google_auth_failed` :
+      `/#/login?error=google_auth_failed`;
+    res.redirect(redirectUrl);
   }
 };
 
