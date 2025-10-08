@@ -9,7 +9,7 @@
 #### Daily Scrum 
 We met regularly to talk about what we finished, what we planned next, and any problems we ran into. We’ve definitely improved in communicating and staying on track compared to the earlier sprints.
 
-- 
+- https://metropoliafi-my.sharepoint.com/:w:/g/personal/suph_metropolia_fi/EfwWN32So3JIqJv2NBxYm_MBgVCWYaNjTbgNONlyyG1FwA?e=vBuqoP
 
 #### Sprint Review
 It went really well and got a lot of positive  feedbacks from the classmates and teacher.
