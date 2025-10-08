@@ -28,6 +28,10 @@ Team Contribution
 
 - https://www.canva.com/design/DAG1HU5DllM/SqR984BwUMa5y1FD0O5N6Q/edit?utm_content=DAG1HU5DllM&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
 
-### Self-Assessment of both Backend and Frontend
+### Self-Assessment of Backend
 
-- https://github.com/chenyicheng1998/Web-Project/tree/self-assessments
+- https://github.com/chenyicheng1998/Web-Project/blob/self-assessments/self-assessmentofBackend.md
+
+### Self-Assessment of Frontend
+
+- https://github.com/chenyicheng1998/Web-Project/blob/self-assessments/self-assessmentofFrontend.md
